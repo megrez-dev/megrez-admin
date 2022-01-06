@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import App from './App.vue'
+import router from './router'
 
 Vue.config.productionTip = false
 
@@ -9,5 +10,6 @@ import 'tdesign-vue/es/style/index.css';
 Vue.use(TDesign);
 
 new Vue({
+  router, 
   render: h => h(App),
 }).$mount('#app')
