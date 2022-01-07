@@ -1,83 +1,42 @@
 <template>
   <t-menu
-    theme="light"
+    :theme="theme"
     defaultValue="2-1"
-    :collapsed="collapsed"
+    :collapsed="isCollapse"
     height="550px"
   >
     <template #logo>
-      <div class="aside-title-wrapper">
+      <div class="aside-title-container">
         <span class="aside-title-logo">M</span>
         <!-- <span class="aside-title-text" v-show="!collapsed">Megrez</span> -->
       </div>
     </template>
-    <t-menu-item value="item1">
-      <template #icon>
-        <icon name="dashboard" />
-      </template>
-      总览
-    </t-menu-item>
-    <t-submenu value="1" mode="popup">
-      <template #icon>
-        <icon name="chart" />
-      </template>
-      <span slot="title">统计</span>
-      <t-menu-item value="1-1">
+    <div class="menu-root-item" v-for="rootItem in menu" :key="rootItem.name">
+      <t-menu-item :value="rootItem.url" v-if="!rootItem.children">
         <template #icon>
-          <icon name="chart" />
+          <icon :name="rootItem.icon" />
         </template>
-        <span>访问量</span>
+        {{ rootItem.label }}
       </t-menu-item>
-      <t-menu-item value="1-2">
+      <t-submenu :value="rootItem.url" mode="popup" v-else>
         <template #icon>
-          <icon name="chart" />
+          <icon :name="rootItem.icon" />
         </template>
-        <span>阅读量</span>
-      </t-menu-item>
-    </t-submenu>
-    <t-submenu value="2" mode="popup">
-      <template #icon>
-        <icon name="view-module" />
-      </template>
-      <span slot="title">文章</span>
-      <t-menu-item value="2-1">
-        <template #icon>
-          <icon name="view-module" />
-        </template>
-        <span>所有文章</span>
-      </t-menu-item>
-      <t-menu-item value="2-2">
-        <template #icon>
-          <icon name="view-module" />
-        </template>
-        <span>写文章</span>
-      </t-menu-item>
-    </t-submenu>
-    <t-menu-item value="item3">
-      <template #icon>
-        <icon name="link" />
-      </template>
-      友链
-    </t-menu-item>
-    <t-menu-item value="item4" :disabled="true">
-      <template #icon>
-        <icon name="edit-1" />
-      </template>
-      日志
-    </t-menu-item>
-    <t-menu-item value="item5">
-      <template #icon>
-        <icon name="user-talk" />
-      </template>
-      评论
-    </t-menu-item>
-    <template #operations>
-      <icon
-        class="t-menu__operations-icon"
-        :name="iconName"
-        @click.native="changeCollapsed"
-      />
-    </template>
+        <span slot="title">{{ rootItem.label }}</span>
+        <div
+          class="menu-sub-item"
+          v-for="subItem in rootItem.children"
+          :key="subItem.name"
+        >
+          <t-menu-item :value="subItem.path">
+            <template #icon>
+              <icon :name="subItem.icon" />
+            </template>
+            <span>{{ subItem.label }}</span>
+          </t-menu-item>
+        </div>
+      </t-submenu>
+    </div>
   </t-menu>
 </template>
 
@@ -85,28 +44,87 @@
 import { Icon } from "tdesign-icons-vue";
 
 export default {
+  data() {
+    return {
+      menu: [
+        {
+          path: "/",
+          name: "overview",
+          label: "总览",
+          icon: "dashboard",
+          url: "/overview",
+        },
+        {
+          path: "/static",
+          name: "static",
+          label: "统计",
+          icon: "chart",
+          url: "/static",
+        },
+        {
+          label: "文章",
+          icon: "view-module",
+          children: [
+            {
+              path: "/list",
+              name: "list",
+              label: "所有文章",
+              icon: "view-module",
+              url: "/article/list",
+            },
+            {
+              path: "/edit",
+              name: "edit",
+              label: "写文章",
+              icon: "view-module",
+              url: "/article/edit",
+            },
+          ],
+        },
+        {
+          path: "/link",
+          name: "link",
+          label: "友链",
+          icon: "link",
+          url: "/link",
+        },
+        {
+          path: "/journal",
+          name: "journal",
+          label: "日志",
+          icon: "edit-1",
+          url: "/journal",
+        },
+        {
+          path: "/comment",
+          name: "comment",
+          label: "评论",
+          icon: "edit-1",
+          url: "/comment",
+        },
+      ],
+    };
+  },
   components: {
     Icon,
   },
-  data() {
-    return {
-      collapsed: false,
-    };
-  },
   computed: {
-    iconName() {
-      return this.collapsed ? "chevron-right" : "chevron-left";
+    isCollapse() {
+      return this.$store.state.app.isCollapse;
     },
-  },
-  methods: {
-    changeCollapsed() {
-      this.collapsed = !this.collapsed;
+    theme() {
+      if (this.$store.state.app.isDark) {
+        return "dark";
+      } else {
+        return "light";
+      }
     },
   },
 };
 </script>
 <style lang="less" scoped>
-.aside-title-wrapper {
+
+.aside-title-container {
   text-align: center;
   flex: 1;
 }

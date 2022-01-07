@@ -1,42 +1,21 @@
 <template>
-  <t-head-menu theme="light" v-model="menu1Value" @change="changeHandler">
+  <t-head-menu :theme="theme">
     <template #logo>
       <div class="header-operator-left">
-        <t-button
-          theme="default"
-          shape="square"
-          variant="text"
-          @click="changeCollapsed"
-        >
-          <t-icon class="collapsed-icon" name="menu-unfold" />
+        <t-button shape="square" variant="text" @click="toggleCollapsed">
+          <t-icon class="collapsed-icon" :name="collapsIcon" />
         </t-button>
       </div>
     </template>
     <template #operations>
       <div class="header-operator-right">
-        <!-- 搜索框 -->
-        <search v-if="layout !== 'side'" :layout="layout" />
-
-        <!-- 全局通知 -->
-        <notice />
-
         <t-tooltip placement="bottom" content="代码仓库">
-          <t-button
-            theme="default"
-            shape="square"
-            variant="text"
-            @click="navToGitHub"
-          >
+          <t-button shape="square" variant="text">
             <t-icon name="logo-github" />
           </t-button>
         </t-tooltip>
         <t-tooltip placement="bottom" content="帮助文档">
-          <t-button
-            theme="default"
-            shape="square"
-            variant="text"
-            @click="navToHelper"
-          >
+          <t-button shape="square" variant="text">
             <t-icon name="help-circle" />
           </t-button>
         </t-tooltip>
@@ -45,10 +24,14 @@
             variant="default-filled"
             size="small"
             default-value="light"
-            @change="changeTheme"
+            @change="toggleTheme"
           >
-            <t-radio-button value="light"><icon name="heart-filled" style="color: orange"/></t-radio-button>
-            <t-radio-button value="dark"><icon name="star-filled" style="color: gray"/></t-radio-button>
+            <t-radio-button value="light"
+              ><icon name="heart-filled" style="color: orange"
+            /></t-radio-button>
+            <t-radio-button value="dark"
+              ><icon name="star-filled" style="color: gray"
+            /></t-radio-button>
           </t-radio-group>
         </div>
       </div>
@@ -69,26 +52,42 @@ export default {
     };
   },
   computed: {
-    // iconName() {
-    //   return this.collapsed ? "chevron-right" : "chevron-left";
-    // },
+    collapsIcon() {
+      if (this.$store.state.app.isCollapse) {
+        return "menu-fold";
+      } else {
+        return "menu-unfold";
+      }
+    },
+    theme() {
+      if (this.$store.state.app.isDark) {
+        return "dark";
+      } else {
+        return "light";
+      }
+    },
   },
   methods: {
-    changeCollapsed() {
-      this.collapsed = !this.collapsed;
+    toggleCollapsed() {
+      this.$store.commit("TOGGLE_COLLAPSED");
     },
-    changeTheme(value) {
+    toggleTheme(value) {
       if (value === "light") {
-        document.documentElement.removeAttribute('theme-mode');
+        document.documentElement.removeAttribute("theme-mode");
       }
       if (value === "dark") {
-        document.documentElement.setAttribute('theme-mode', 'dark');
+        document.documentElement.setAttribute("theme-mode", "dark");
       }
-    }
+      // TODO: 设置主题
+      document.documentElement.setAttribute("theme-color", "default");
+      this.$store.commit("TOGGLE_THEME");
+    },
   },
 };
 </script>
-<style lang="less" scoped>
+<style lang="less">
+@import "@/style/variables.less";
+
 .header-operator-left {
   display: flex;
   margin-left: 20px;
@@ -97,6 +96,13 @@ export default {
 
   .collapsed-icon {
     font-size: 20px;
+  }
+}
+
+.t-icon {
+  font-size: 20px !important;
+  &.general {
+    margin-right: 16px;
   }
 }
 
@@ -109,13 +115,6 @@ export default {
     margin: 0 8px;
     &.header-user-btn {
       margin: 0;
-    }
-  }
-
-  .t-icon {
-    font-size: 20px;
-    &.general {
-      margin-right: 16px;
     }
   }
 
@@ -139,6 +138,23 @@ export default {
           font-size: 16px;
         }
       }
+    }
+  }
+}
+
+.t-head-menu__inner {
+  border-bottom: 1px solid @border-level-1-color;
+}
+
+.t-menu--dark {
+  .t-head-menu__inner {
+    border-bottom: 1px solid var(--td-gray-color-10);
+  }
+
+  .t-button {
+    --ripple-color: var(--td-gray-color-10) !important;
+    &:hover {
+      background: var(--td-gray-color-12) !important;
     }
   }
 }

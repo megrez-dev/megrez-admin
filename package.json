@@ -10,6 +10,8 @@
   "dependencies": {
     "core-js": "^3.6.5",
     "less-loader": "^7.3.0",
+    "node-sass": "^7.0.1",
+    "sass-loader": "^7.3.0",
     "tdesign-vue": "^0.32.0",
     "vditor": "^3.8.10",
     "vue": "^2.6.11",

@@ -1,33 +1,54 @@
 <template>
-  <div id="app"></div>
+  <div id="vditor">
+  </div>
 </template>
 
 <script>
-import Vue from "vue";
 import Vditor from "vditor";
+import "vditor/dist/index.css";
 
-new Vue({
-  el: "#app",
+export default {
   data() {
     return {
-      contentEditor: "",
-    };
+      contentEditor: null
+    }
   },
   mounted() {
     this.contentEditor = new Vditor("vditor", {
-      height: 360,
+      height: 800,
       toolbarConfig: {
-        pin: true,
+        pin: false,
+      },
+      counter: {
+        enable: true,
+        type: 'markdown'
+      },
+      preview: {
+        delay: 200,
+      },
+      outline: {
+        enable: true,
       },
       cache: {
         enable: false,
       },
-      after: () => {
-        this.contentEditor.setValue("hello, Vditor + Vue!");
-      },
     });
   },
-});
+  watch: {
+    // 监听 store里面的数据
+    "$store.state.app.isDark": {
+      deep: true,
+      handler: function (newValue) {
+        // result为true，则表示是全部选中
+        if (newValue) {
+          this.contentEditor.setTheme('dark', 'dark')
+        }else {
+          this.contentEditor.setTheme('classic', 'light')
+        }
+      }
+    }
+  }
+};
 </script>
 
 <style></style>
