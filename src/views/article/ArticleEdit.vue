@@ -57,14 +57,58 @@
                 <t-switch v-model="basicSetting.isTop"></t-switch>
               </t-form-item>
               <t-form-item label="分类" name="category">
-                <t-radio-group v-model="basicSetting.category">
-                  <t-radio
-                    v-for="item in categoryOptions"
-                    :value="item.id"
-                    :key="item.id"
-                    >{{ item.name }}</t-radio
-                  >
-                </t-radio-group>
+                <div class="category-form-container">
+                  <t-radio-group v-model="basicSetting.category">
+                    <t-radio
+                      v-for="item in categoryOptions"
+                      :value="item.id"
+                      :key="item.id"
+                      >{{ item.name }}</t-radio
+                    >
+                  </t-radio-group>
+                  <div class="create-category-form-container">
+                    <t-button
+                      theme="primary"
+                      @click="showAddCategoryForm = true"
+                      v-show="!showAddCategoryForm"
+                    >
+                      <add-icon slot="icon" size="200px" />
+                      新建
+                    </t-button>
+                    <t-form
+                      :data="newCategory"
+                      ref="form"
+                      v-show="showAddCategoryForm"
+                      scrollToFirstError="smooth"
+                    >
+                      <t-form-item label="分类名称" name="name">
+                        <t-input v-model="newCategory.name"></t-input>
+                      </t-form-item>
+                      <t-form-item
+                        label="分类别名"
+                        help="尽量使用英文或拼音"
+                        name="slug"
+                      >
+                        <t-input v-model="newCategory.slug"></t-input>
+                      </t-form-item>
+                      <t-form-item style="padding-top: 8px">
+                        <t-button
+                          theme="primary"
+                          style="margin-right: 10px"
+                          @click="submitCreateCategory"
+                          >保存</t-button
+                        >
+                        <t-button
+                          theme="default"
+                          variant="base"
+                          style="margin-right: 10px"
+                          @click="cancelCreateCategory"
+                          >取消</t-button
+                        >
+                      </t-form-item>
+                    </t-form>
+                  </div>
+                </div>
               </t-form-item>
               <t-form-item label="标签" name="tags">
                 <t-select
@@ -112,7 +156,43 @@
           <template #label>
             <icon name="calendar" style="margin-right: 4px" /> 高级设置
           </template>
-          <p style="padding: 25px">日程的内容</p>
+          <div class="advanced-setting-form-container">
+            <t-form
+              :data="advancedSetting"
+              ref="form"
+              labelAlign="top"
+              :colon="true"
+            >
+              <t-form-item label="访问密码" name="password">
+                <t-input
+                  type="password"
+                  v-model="advancedSetting.password"
+                  placeholder=""
+                >
+                </t-input>
+              </t-form-item>
+              <t-form-item label="SEO 关键字" name="keywords">
+                <t-select
+                  v-model="basicSetting.tags"
+                  creatable
+                  filterable
+                  multiple
+                  placeholder="若不填写，将使用标签作为关键字"
+                  :options="seoKeywordOptions"
+                  :minCollapsedNum="3"
+                  @create="createSEOKeyword"
+                />
+              </t-form-item>
+              <t-form-item label="SEO 描述" name="description">
+                <t-textarea
+                  v-model="basicSetting.digest"
+                  placeholder="若不填写，将使用摘要作为描述"
+                  name="digest"
+                  :autosize="{ minRows: 5 }"
+                />
+              </t-form-item>
+            </t-form>
+          </div>
         </t-tab-panel>
       </t-tabs>
     </div>
@@ -132,7 +212,7 @@
 
 <script>
 import Vditor from "@/components/vditor/Vditor.vue";
-import { Icon } from "tdesign-icons-vue";
+import { Icon, AddIcon } from "tdesign-icons-vue";
 
 export default {
   name: "PostEdit",
@@ -147,8 +227,14 @@ export default {
         isTop: false,
         category: 1,
         tags: [],
+        // TODO: 直接用这个 tag 提交会有问题，只有新增没有删除
         digest: "",
         cover: "",
+      },
+      advancedSetting: {
+        password: "",
+        seoKeywords: [],
+        seoDescription: "",
       },
       categoryOptions: [
         {
@@ -171,6 +257,12 @@ export default {
         { label: "中文1", value: "中文1" },
         { label: "中文2", value: "中文2" },
       ],
+      seoKeywordOptions: [],
+      showAddCategoryForm: false,
+      newCategory: {
+        name: "",
+        slug: "",
+      },
     };
   },
   methods: {
@@ -189,8 +281,24 @@ export default {
         label: value,
       });
     },
+    createSEOKeyword(value) {
+      this.seoKeywordOptions.push({
+        value,
+        label: value,
+      });
+    },
+    submitCreateCategory() {
+      this.categoryOptions.push({
+        id: 5,
+        name: this.newCategory.name,
+      });
+      this.showAddCategoryForm = false;
+    },
+    cancelCreateCategory() {
+      this.showAddCategoryForm = false;
+    },
   },
-  components: { Vditor, Icon },
+  components: { Vditor, Icon, AddIcon },
 };
 </script>
 
@@ -225,18 +333,31 @@ export default {
   .basic-setting-form-container {
     padding: 30px 30px;
     max-width: 600px;
+    .category-form-container {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      // .category-form-container-options {
+      //   display: flex;
+      //   flex-direction: row;
+      // }
+      // .category-form-container-create {
+      //   width: 100%;
+      //   display: flex;
+      //   flex-direction: column;
+      // }
+    }
+
     .article-cover-setting {
       width: 100%;
       display: flex;
       flex-direction: column;
       .article-cover-preview {
-        // height: 360px;
         width: 100%;
         cursor: pointer;
         border-radius: 4px;
-        padding: auto;
         img {
-          // vertical-align: middle;
+          vertical-align: middle;
           width: 100%;
           border-style: none;
         }
@@ -245,6 +366,10 @@ export default {
         margin-top: 10px;
       }
     }
+  }
+  .advanced-setting-form-container {
+    padding: 30px 30px;
+    max-width: 600px;
   }
 }
 </style>
