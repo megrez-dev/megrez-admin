@@ -1,6 +1,5 @@
 <template>
-  <div id="vditor">
-  </div>
+  <div id="vditor"></div>
 </template>
 
 <script>
@@ -10,8 +9,8 @@ import "vditor/dist/index.css";
 export default {
   data() {
     return {
-      contentEditor: null
-    }
+      contentEditor: null,
+    };
   },
   mounted() {
     this.contentEditor = new Vditor("vditor", {
@@ -21,7 +20,7 @@ export default {
       },
       counter: {
         enable: true,
-        type: 'markdown'
+        type: "markdown",
       },
       preview: {
         delay: 200,
@@ -32,6 +31,13 @@ export default {
       cache: {
         enable: false,
       },
+      after: () => {
+        if (this.$store.state.app.isDark) {
+          this.contentEditor.setTheme("dark", "dark");
+        } else {
+          this.contentEditor.setTheme("classic", "light");
+        }
+      },
     });
   },
   watch: {
@@ -41,13 +47,13 @@ export default {
       handler: function (newValue) {
         // result为true，则表示是全部选中
         if (newValue) {
-          this.contentEditor.setTheme('dark', 'dark')
-        }else {
-          this.contentEditor.setTheme('classic', 'light')
+          this.contentEditor.setTheme("dark", "dark");
+        } else {
+          this.contentEditor.setTheme("classic", "light");
         }
-      }
-    }
-  }
+      },
+    },
+  },
 };
 </script>
 

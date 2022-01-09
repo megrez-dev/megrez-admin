@@ -1,10 +1,5 @@
 <template>
-  <t-menu
-    :theme="theme"
-    defaultValue="2-1"
-    :collapsed="isCollapse"
-    height="550px"
-  >
+  <t-menu :theme="theme" :collapsed="collapsed">
     <template #logo>
       <div class="aside-title-container">
         <span class="aside-title-logo">M</span>
@@ -12,27 +7,27 @@
       </div>
     </template>
     <div class="menu-root-item" v-for="rootItem in menu" :key="rootItem.name">
-      <t-menu-item :value="rootItem.url" v-if="!rootItem.children">
+      <t-menu-item :value="rootItem.name" :to="{name: rootItem.name}" v-if="!rootItem.children">
         <template #icon>
-          <icon :name="rootItem.icon" />
+          <icon :name="rootItem.meta.icon" />
         </template>
-        {{ rootItem.label }}
+        {{ rootItem.meta.title }}
       </t-menu-item>
-      <t-submenu :value="rootItem.url" mode="popup" v-else>
+      <t-submenu :value="rootItem.name" mode="popup" v-else>
         <template #icon>
-          <icon :name="rootItem.icon" />
+          <icon :name="rootItem.meta.icon" />
         </template>
-        <span slot="title">{{ rootItem.label }}</span>
+        <span slot="title">{{ rootItem.meta.title }}</span>
         <div
           class="menu-sub-item"
           v-for="subItem in rootItem.children"
           :key="subItem.name"
         >
-          <t-menu-item :value="subItem.path">
+          <t-menu-item :value="subItem.path" :to="{name: subItem.name}">
             <template #icon>
-              <icon :name="subItem.icon" />
+              <icon :name="subItem.meta.icon" />
             </template>
-            <span>{{ subItem.label }}</span>
+            <span>{{ subItem.meta.title }}</span>
           </t-menu-item>
         </div>
       </t-submenu>
@@ -42,75 +37,13 @@
 
 <script>
 import { Icon } from "tdesign-icons-vue";
+import { routes } from "@/config/router.config.js";
 
 export default {
-  data() {
-    return {
-      menu: [
-        {
-          path: "/",
-          name: "overview",
-          label: "总览",
-          icon: "dashboard",
-          url: "/overview",
-        },
-        {
-          path: "/static",
-          name: "static",
-          label: "统计",
-          icon: "chart",
-          url: "/static",
-        },
-        {
-          label: "文章",
-          icon: "view-module",
-          children: [
-            {
-              path: "/list",
-              name: "list",
-              label: "所有文章",
-              icon: "view-module",
-              url: "/article/list",
-            },
-            {
-              path: "/edit",
-              name: "edit",
-              label: "写文章",
-              icon: "view-module",
-              url: "/article/edit",
-            },
-          ],
-        },
-        {
-          path: "/link",
-          name: "link",
-          label: "友链",
-          icon: "link",
-          url: "/link",
-        },
-        {
-          path: "/journal",
-          name: "journal",
-          label: "日志",
-          icon: "edit-1",
-          url: "/journal",
-        },
-        {
-          path: "/comment",
-          name: "comment",
-          label: "评论",
-          icon: "edit-1",
-          url: "/comment",
-        },
-      ],
-    };
-  },
-  components: {
-    Icon,
-  },
+  components: { Icon },
   computed: {
-    isCollapse() {
-      return this.$store.state.app.isCollapse;
+    collapsed() {
+      return this.$store.state.app.collapsed;
     },
     theme() {
       if (this.$store.state.app.isDark) {
@@ -119,11 +52,18 @@ export default {
         return "light";
       }
     },
+    menu() {
+      return routes;
+    },
   },
 };
 </script>
-<style lang="less" scoped>
-
+<style lang="less">
+aside {
+  position: fixed;
+  top: 0;
+  z-index: 1;
+}
 .aside-title-container {
   text-align: center;
   flex: 1;

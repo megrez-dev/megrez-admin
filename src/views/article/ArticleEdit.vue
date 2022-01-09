@@ -6,9 +6,10 @@
       }}</span>
       <span class="article-edit-bar-operator">
         <span class="article-edit-bar-operator-item">
-          <t-button theme="warning" variant="base" @click="saveDraft"
-            >保存草稿</t-button
-          >
+          <t-button theme="warning" variant="dashed" @click="openDrawer">附件</t-button>
+        </span>
+        <span class="article-edit-bar-operator-item">
+          <t-button theme="danger" variant="base" @click="saveDraft">保存草稿</t-button>
         </span>
         <span class="article-edit-bar-operator-item">
           <t-button theme="primary" variant="base" @click="preview"
@@ -16,7 +17,7 @@
           >
         </span>
         <span class="article-edit-bar-operator-item">
-          <t-button theme="primary" variant="base" @click="openDrawer"
+          <t-button theme="primary" variant="base" @click="publish"
             >发布</t-button
           >
         </span>
@@ -35,7 +36,7 @@
       >
         <t-tab-panel value="basic">
           <template #label>
-            <icon name="home" style="margin-right: 4px" /> 基本设置
+            <icon name="setting" style="margin-right: 4px" /> 基本设置
           </template>
           <div class="basic-setting-form-container">
             <t-form
@@ -56,8 +57,9 @@
               <t-form-item label="是否置顶" name="isTop">
                 <t-switch v-model="basicSetting.isTop"></t-switch>
               </t-form-item>
+              <t-divider></t-divider>
               <t-form-item label="分类" name="category">
-                <div class="category-form-container">
+                <div class="category-container">
                   <t-radio-group v-model="basicSetting.category">
                     <t-radio
                       v-for="item in categoryOptions"
@@ -66,50 +68,70 @@
                       >{{ item.name }}</t-radio
                     >
                   </t-radio-group>
-                  <div class="create-category-form-container">
-                    <t-button
-                      theme="primary"
-                      @click="showAddCategoryForm = true"
-                      v-show="!showAddCategoryForm"
-                    >
-                      <add-icon slot="icon" size="200px" />
-                      新建
-                    </t-button>
-                    <t-form
-                      :data="newCategory"
-                      ref="form"
-                      v-show="showAddCategoryForm"
-                      scrollToFirstError="smooth"
-                    >
-                      <t-form-item label="分类名称" name="name">
-                        <t-input v-model="newCategory.name"></t-input>
-                      </t-form-item>
-                      <t-form-item
-                        label="分类别名"
-                        help="尽量使用英文或拼音"
-                        name="slug"
+                  <div class="create-category-container">
+                    <div class="create-category-button-container">
+                      <t-button
+                        theme="primary"
+                        @click="showAddCategoryForm = true"
+                        v-show="!showAddCategoryForm"
                       >
-                        <t-input v-model="newCategory.slug"></t-input>
-                      </t-form-item>
-                      <t-form-item style="padding-top: 8px">
-                        <t-button
-                          theme="primary"
-                          style="margin-right: 10px"
-                          @click="submitCreateCategory"
-                          >保存</t-button
-                        >
-                        <t-button
-                          theme="default"
-                          variant="base"
-                          style="margin-right: 10px"
-                          @click="cancelCreateCategory"
-                          >取消</t-button
-                        >
-                      </t-form-item>
-                    </t-form>
+                        <add-icon slot="icon" size="200px" />
+                        新建
+                      </t-button>
+                    </div>
+                    <div class="create-category-form-container">
+                      <t-form
+                        :data="newCategory"
+                        ref="form"
+                        v-show="showAddCategoryForm"
+                        scrollToFirstError="smooth"
+                        labelWidth="0"
+                      >
+                        <div class="create-category-form-item">
+                          <t-form-item name="name">
+                            <t-input
+                              v-model="newCategory.name"
+                              placeholder="分类名称"
+                            ></t-input>
+                          </t-form-item>
+                        </div>
+                        <div class="create-category-form-item">
+                          <t-form-item
+                            :help="
+                              'http://alkaidchen.com/category/' +
+                              newCategory.slug
+                            "
+                            name="slug"
+                          >
+                            <t-input
+                              v-model="newCategory.slug"
+                              placeholder="分类别名"
+                            ></t-input>
+                          </t-form-item>
+                        </div>
+                        <div class="create-category-form-item">
+                          <t-form-item style="padding-top: 8px">
+                            <t-button
+                              theme="primary"
+                              style="margin-right: 10px"
+                              @click="submitCreateCategory"
+                              >保存</t-button
+                            >
+                            <t-button
+                              theme="default"
+                              variant="base"
+                              style="margin-right: 10px"
+                              @click="cancelCreateCategory"
+                              >取消</t-button
+                            >
+                          </t-form-item>
+                        </div>
+                      </t-form>
+                    </div>
                   </div>
                 </div>
               </t-form-item>
+              <t-divider></t-divider>
               <t-form-item label="标签" name="tags">
                 <t-select
                   v-model="basicSetting.tags"
@@ -126,7 +148,7 @@
                   v-model="basicSetting.digest"
                   placeholder="若不填写，将会从文章中自动截取"
                   name="digest"
-                  :autosize="{ minRows: 5 }"
+                  :autosize="{ minRows: 6 }"
                 />
               </t-form-item>
               <t-form-item label="封面图" name="cover">
@@ -154,7 +176,7 @@
         </t-tab-panel>
         <t-tab-panel value="advanced">
           <template #label>
-            <icon name="calendar" style="margin-right: 4px" /> 高级设置
+            <icon name="internet" style="margin-right: 4px" /> 高级设置
           </template>
           <div class="advanced-setting-form-container">
             <t-form
@@ -215,7 +237,7 @@ import Vditor from "@/components/vditor/Vditor.vue";
 import { Icon, AddIcon } from "tdesign-icons-vue";
 
 export default {
-  name: "PostEdit",
+  name: "ArticleEdit",
   data() {
     return {
       articleTitle: "",
@@ -275,6 +297,9 @@ export default {
     openDrawer() {
       this.drawerVisible = true;
     },
+    publish() {
+      console.log("发布");
+    },
     createTag(value) {
       this.tagOptions.push({
         value,
@@ -303,6 +328,8 @@ export default {
 </script>
 
 <style lang="less" scoped>
+@import "@/style/variables";
+
 .article-edit-container {
   margin-top: 10px;
   .article-edit-bar {
@@ -311,8 +338,9 @@ export default {
     margin-bottom: 20px;
     .article-edit-bar-title {
       font-size: 30px;
-      font-weight: 1500;
+      font-weight: 1000;
       text-align: center;
+      // color: @brand-color-1;
     }
     .article-edit-bar-operator {
       float: right;
@@ -333,19 +361,26 @@ export default {
   .basic-setting-form-container {
     padding: 30px 30px;
     max-width: 600px;
-    .category-form-container {
+    .category-container {
       display: flex;
       flex-direction: column;
       width: 100%;
-      // .category-form-container-options {
-      //   display: flex;
-      //   flex-direction: row;
-      // }
-      // .category-form-container-create {
-      //   width: 100%;
-      //   display: flex;
-      //   flex-direction: column;
-      // }
+      .create-category-container {
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+        .create-category-button-container {
+          margin: 15px 0;
+        }
+        .create-category-form-container {
+          width: 100%;
+          margin: 15px 0;
+          .create-category-form-item {
+            width: 100%;
+            margin: 15px 0;
+          }
+        }
+      }
     }
 
     .article-cover-setting {

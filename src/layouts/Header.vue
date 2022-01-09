@@ -46,14 +46,9 @@ export default {
   components: {
     Icon,
   },
-  data() {
-    return {
-      collapsed: true,
-    };
-  },
   computed: {
     collapsIcon() {
-      if (this.$store.state.app.isCollapse) {
+      if (this.$store.state.app.collapsed) {
         return "menu-fold";
       } else {
         return "menu-unfold";
@@ -87,6 +82,12 @@ export default {
 </script>
 <style lang="less">
 @import "@/style/variables.less";
+
+// header {
+//   position: sticky;
+//   top: 0;
+//   z-index: 1;
+// }
 
 .header-operator-left {
   display: flex;

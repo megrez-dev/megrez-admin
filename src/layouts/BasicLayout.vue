@@ -1,39 +1,28 @@
 <template>
-  <div class="layout-container">
-    <t-layout>
+  <t-layout style="height: 100vh">
     <t-aside width="auto">
       <Aside></Aside>
     </t-aside>
     <t-layout>
-        <t-header><Header></Header></t-header>
-        <t-content class="content-layout">
-          <BreadCrumb></BreadCrumb>
-          <PostEdit></PostEdit>
-        </t-content>
-        <t-footer>Footer</t-footer>
+      <t-header style="position: sticky; top: 0; z-index: 1">
+        <Header></Header>
+      </t-header>
+      <t-content style="padding: 24px">
+        <BreadCrumb></BreadCrumb>
+        <router-view></router-view>
+      </t-content>
+      <t-footer style="text-align:center;">Megrez designed by AlkaidChen</t-footer>
     </t-layout>
-    </t-layout>
-</div>
+  </t-layout>
 </template>
 
 <script>
-import Aside from '@/layouts/Aside.vue' 
-import Header from '@/layouts/Header.vue'
-import BreadCrumb from '@/layouts/BreadCrumb.vue'
-import PostEdit from '@/views/article/ArticleEdit.vue'
-export default {
-  name: 'BasicLayout',
-  components: {Aside, Header, BreadCrumb, PostEdit}
-}
-</script>
+import Aside from "@/layouts/Aside.vue";
+import Header from "@/layouts/Header.vue";
+import BreadCrumb from "@/layouts/BreadCrumb.vue";
 
-<style lang="less" scoped>
-.layout-container {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  .content-layout {
-    padding: 24px;
-  }
-}
-</style>
+export default {
+  name: "BasicLayout",
+  components: { Aside, Header, BreadCrumb },
+};
+</script>
