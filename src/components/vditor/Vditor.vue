@@ -15,6 +15,7 @@ export default {
   mounted() {
     this.contentEditor = new Vditor("vditor", {
       height: 800,
+      icon: 'material',
       toolbarConfig: {
         pin: false,
       },

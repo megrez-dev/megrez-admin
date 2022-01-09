@@ -35,14 +35,14 @@ export const routes = [
         ],
     },
     {
-        path: '/link',
-        component: () => import('@/views/article/ArticleList.vue'),
-        name: 'Link',
+        path: '/links',
+        component: () => import('@/views/links/Links.vue'),
+        name: 'Links',
         meta: { title: '友链', icon: 'link' }
     },
     {
         path: '/journal',
-        component: () => import('@/views/article/ArticleList.vue'),
+        component: () => import('@/views/journal/Journal.vue'),
         name: 'Journal',
         meta: { title: '日志', icon: 'edit-1' }
     },

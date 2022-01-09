@@ -18,6 +18,11 @@
         :pagination="pagination"
         @change="rehandleChange"
       >
+      <template #op="slotProps">
+            <a class="t-button-link" @click="handleClickDetail()">编辑</a>
+            <t-divider layout="vertical" />
+            <a class="t-button-link" @click="handleClickRecyle(slotProps)">回收站</a>
+          </template>
       </t-table>
     </div>
   </div>
@@ -58,6 +63,12 @@ export default {
           width: 260,
           colKey: "email",
           title: "邮箱",
+        },
+        {
+          fixed: 'right',
+          width: 200,
+          colKey: 'op',
+          title: '操作',
         },
       ],
       rowKey: "property",
@@ -127,6 +138,12 @@ export default {
     .left-operation-container {
       padding: 0 0 6px 0;
       margin-bottom: 16px;
+    }
+    .t-button-link {
+        color: @brand-color;
+        text-decoration: none;
+        cursor: pointer;
+        transition: color .2s cubic-bezier(.38,0,.24,1);
     }
   }
 }
