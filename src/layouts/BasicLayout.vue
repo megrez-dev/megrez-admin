@@ -1,5 +1,5 @@
 <template>
-  <t-layout style="height: 100vh">
+  <t-layout>
     <t-aside width="auto">
       <Aside></Aside>
     </t-aside>
@@ -7,7 +7,7 @@
       <t-header style="position: sticky; top: 0; z-index: 1">
         <Header></Header>
       </t-header>
-      <t-content style="padding: 24px">
+      <t-content style="padding: 24px 24px 0">
         <BreadCrumb></BreadCrumb>
         <router-view></router-view>
       </t-content>

@@ -37,7 +37,7 @@
 
 <script>
 import { Icon } from "tdesign-icons-vue";
-import { routes } from "@/config/router.config.js";
+import { routes } from "@/config/routes.js";
 
 export default {
   components: { Icon },

@@ -181,13 +181,11 @@ export default {
           url.searchParams.append(key, params[key])
         );
         const response = await fetch(url).then((x) => x.json());
-        console.log("response", response);
         this.data = response.results;
         this.pagination = {
           ...pagination,
           total: 120,
         };
-        console.log("分页数据", response.results);
       } catch (err) {
         this.data = [];
       }

@@ -12,19 +12,33 @@ export default {
       contentEditor: null,
     };
   },
+  props: {
+    origionContent: {
+      type: String,
+      required: false,
+      default: "",
+    },
+  },
+  methods: {
+    contentChange() {
+      this.$emit(
+        "contentChange",
+        this.contentEditor.getValue(),
+        this.contentEditor.getHTML()
+      );
+    },
+  },
   mounted() {
     this.contentEditor = new Vditor("vditor", {
       height: 800,
-      icon: 'material',
-      toolbarConfig: {
-        pin: false,
-      },
+      icon: "material",
+      input: this.contentChange,
       counter: {
         enable: true,
         type: "markdown",
       },
       preview: {
-        delay: 200,
+        delay: 50,
       },
       outline: {
         enable: true,
@@ -38,6 +52,7 @@ export default {
         } else {
           this.contentEditor.setTheme("classic", "light");
         }
+        this.contentEditor.insertValue(this.origionContent);
       },
     });
   },
