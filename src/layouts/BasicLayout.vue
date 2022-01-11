@@ -4,14 +4,12 @@
       <Aside></Aside>
     </t-aside>
     <t-layout>
-      <t-header style="position: sticky; top: 0; z-index: 1">
+      <t-header>
         <Header></Header>
       </t-header>
-      <t-content style="padding: 24px 24px 0">
-        <BreadCrumb></BreadCrumb>
-        <router-view></router-view>
+      <t-content>
+        <Content></Content>
       </t-content>
-      <t-footer style="text-align:center;">Megrez designed by AlkaidChen</t-footer>
     </t-layout>
   </t-layout>
 </template>
@@ -19,10 +17,13 @@
 <script>
 import Aside from "@/layouts/Aside.vue";
 import Header from "@/layouts/Header.vue";
-import BreadCrumb from "@/layouts/BreadCrumb.vue";
+import Content from "@/layouts/Content.vue";
+import "@/style/layout.less";
 
 export default {
   name: "BasicLayout",
-  components: { Aside, Header, BreadCrumb },
+  components: { Aside, Header, Content },
 };
 </script>
+<style lang="less" scoped>
+</style>
