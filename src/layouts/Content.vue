@@ -1,24 +1,25 @@
 <template>
   <t-layout class="megrez-layout">
     <t-content class="megrez-content-layout">
-    <BreadCrumb></BreadCrumb>
-    <transition name="fade" mode="out-in">
-      <div class="page-component-wrapper">
-        <router-view />
-      </div>
-    </transition>
+      <BreadCrumb></BreadCrumb>
+      <transition name="fade" mode="out-in">
+        <div class="page-component-wrapper">
+          <router-view />
+        </div>
+      </transition>
     </t-content>
-    <t-footer style="text-align: center"
-      >Megrez designed by AlkaidChen</t-footer
-    >
+    <t-footer class="megrez-footer-layout">
+      <Footer></Footer>
+    </t-footer>
   </t-layout>
 </template>
 
 <script>
 import BreadCrumb from "@/layouts/BreadCrumb.vue";
+import Footer from "@/layouts/Footer.vue";
 export default {
   name: "Content",
-  components: { BreadCrumb },
+  components: { BreadCrumb,Footer },
 };
 </script>
 
@@ -32,11 +33,5 @@ export default {
 .fade-enter,
 .fade-leave-to {
   opacity: 0;
-}
-
-.page-component-wrapper {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
 }
 </style>
