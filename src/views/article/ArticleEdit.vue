@@ -21,7 +21,7 @@
           >
         </span>
         <span class="article-edit-bar-operator-item">
-          <t-button theme="primary" variant="base" @click="publish"
+          <t-button theme="primary" variant="base" @click="handlePublish"
             >发布</t-button
           >
         </span>
@@ -46,7 +46,10 @@
             <t-form-item
               label="文章别名"
               name="slug"
-              :help="'http://alkaidchen.com/article/' + (article.slug === '' ? '{slug}' : article.slug)"
+              :help="
+                'http://alkaidchen.com/article/' +
+                (article.slug === '' ? '{slug}' : article.slug)
+              "
             >
               <t-input
                 v-model="article.slug"
@@ -100,7 +103,12 @@
                       <div class="create-category-form-item">
                         <t-form-item
                           name="slug"
-                          :help="'http://alkaidchen.com/category/' + (newCategory.slug === '' ? '{slug}' : newCategory.slug)"
+                          :help="
+                            'http://alkaidchen.com/category/' +
+                            (newCategory.slug === ''
+                              ? '{slug}'
+                              : newCategory.slug)
+                          "
                         >
                           <t-input
                             v-model="newCategory.slug"
@@ -113,7 +121,7 @@
                           <t-button
                             theme="primary"
                             style="margin-right: 10px"
-                            @click="submitCreateCategory"
+                            @click="handleCreateCategory"
                             >保存</t-button
                           >
                           <t-button
@@ -139,7 +147,7 @@
                 multiple
                 :minCollapsedNum="3"
                 :options="tagOptions"
-                @create="createTag"
+                @create="handleCreateTag"
               />
             </t-form-item>
             <t-form-item label="摘要" name="digest">
@@ -241,7 +249,7 @@ export default {
         slug: "",
         allowedComment: true,
         isTop: false,
-        category: 1,
+        category: 0,
         tags: [],
         // TODO: 直接用这个 tag 提交会有问题，只有新增没有删除
         digest: "",
@@ -250,20 +258,7 @@ export default {
         seoKeywords: [],
         seoDescription: "",
       },
-      categoryOptions: [
-        {
-          id: 1,
-          name: "默认分类",
-        },
-        {
-          id: 2,
-          name: "LeetCode",
-        },
-        {
-          id: 3,
-          name: "Kubernetes",
-        },
-      ],
+      categoryOptions: [],
       tagOptions: [
         { label: "Kubernetes", value: "Kubernetes" },
         { label: "Docker", value: "Docker" },
@@ -295,13 +290,26 @@ export default {
     openDrawer() {
       this.attachDrawerVisible = true;
     },
-    publish() {
+    handlePublish() {
       //validate
       if (this.article.title === "") {
         this.$message.warning("文章标题不能为空");
+        return;
       }
+      this.$request
+        .post("/article", this.article)
+        .then((res) => {
+          if (res.status === 0) {
+            this.$message.success("发布成功");
+          } else {
+            this.$message.error(res.msg);
+          }
+        })
+        .catch((err) => {
+          this.$message.error(err.msg);
+        });
     },
-    createTag(value) {
+    handleCreateTag(value) {
       this.tagOptions.push({
         value,
         label: value,
@@ -313,18 +321,58 @@ export default {
         label: value,
       });
     },
-    submitCreateCategory() {
-      this.categoryOptions.push({
-        id: 5,
-        name: this.newCategory.name,
-      });
-      this.showAddCategoryForm = false;
+    handleCreateCategory() {
+      if (this.newCategory.name === "") {
+        this.$message.warning("分类名称不能为空");
+        return;
+      }
+      if (this.newCategory.slug === "") {
+        this.$message.warning("分类别名不能为空");
+        return;
+      }
+      this.$request
+        .post("category", this.newCategory)
+        .then((res) => {
+          console.log("res", res);
+          if (res.status === 0) {
+            this.$message.success("添加分类成功");
+            this.categoryOptions.push({
+              id: res.data.id,
+              name: res.data.name,
+            });
+            this.showAddCategoryForm = false;
+          }
+        })
+        .catch((err) => {
+          console.log("err", err);
+          this.$message.error(err.msg);
+        });
     },
     cancelCreateCategory() {
       this.showAddCategoryForm = false;
     },
   },
   components: { Vditor, Icon, AddIcon },
+  mounted() {
+    this.$request
+      .get("categories")
+      .then((res) => {
+        console.log("res", res);
+        if (res.status === 0) {
+          res.data.forEach((category) => {
+            this.categoryOptions.push({
+              id: category.ID,
+              name: category.name,
+              slug: category.slug,
+            });
+          });
+        }
+      })
+      .catch((err) => {
+        console.log("err", err);
+        this.$message.error("获取分类列表失败");
+      });
+  },
 };
 </script>
 

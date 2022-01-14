@@ -1,6 +1,6 @@
 import axios from 'axios';
 import host from '@/config/host';
-import store from '@/store'
+// import store from '@/store'
 import { MessagePlugin } from 'tdesign-vue';
 
 // const env = import.meta.env.MODE || 'development';
@@ -10,7 +10,10 @@ const API_HOST = host['dev'].API
 
 const CODE = {
     SUCCESS: 0,
+    ERROR:-1,
 };
+
+axios.defaults.withCredentials = false
 
 const instance = axios.create({
     baseURL: API_HOST,
@@ -20,30 +23,29 @@ const instance = axios.create({
 
 instance.interceptors.retry = 3;
 
-instance.interceptors.request.use(
-    config => {
-        const token = store.getters.token
-        if (token && token.access_token) {
-            config.headers['Admin-Authorization'] = token.access_token
-        }
-        return config
-    },
-    error => {
-        console.log('request error', error)
-        MessagePlugin.error('网络请求失败')
-        return Promise.reject(error)
-    }
-)
+// instance.interceptors.request.use(
+//     config => {
+//         const token = store.getters.token
+//         if (token && token.access_token) {
+//             config.headers['Admin-Authorization'] = token.access_token
+//         }
+//         return config
+//     },
+//     error => {
+//         console.log('request error', error)
+//         MessagePlugin.error('网络请求失败')
+//         return Promise.reject(error)
+//     }
+// )
 
 instance.interceptors.response.use(
     (response) => {
         if (response.status === 200) {
-            const { data } = response;
-            if (data.code === CODE.SUCCESS) {
-                return data;
-            }else if (data.code === 100) {
-                // TODO: 业务码
-                // 重定向到登录 | 弹出登录框
+            if (response.data.status === CODE.SUCCESS) {
+                return response.data;
+            }else {
+                console.log("response.data", response.data)
+                return Promise.reject(response.data);
             }
         }else {
             MessagePlugin.error('请求失败')
