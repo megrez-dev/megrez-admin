@@ -27,6 +27,12 @@ export default {
         this.contentEditor.getHTML()
       );
     },
+    countWord(length) {
+      this.$emit(
+        "countWord",
+        length
+      )
+    }
   },
   mounted() {
     this.contentEditor = new Vditor("vditor", {
@@ -35,7 +41,10 @@ export default {
       input: this.contentChange,
       counter: {
         enable: true,
-        type: "markdown",
+        type: "text",
+        after: (length) => {
+          this.countWord(length)
+        }
       },
       preview: {
         delay: 50,

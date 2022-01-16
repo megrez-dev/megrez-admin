@@ -34,6 +34,7 @@
       <Vditor
         :originalContent="article.originalContent"
         @contentChange="onContentChange"
+        @countWord="countWord"
       ></Vditor>
     </div>
     <t-tabs defaultValue="basic">
@@ -65,14 +66,10 @@
             <t-divider></t-divider>
             <t-form-item label="分类" name="category">
               <div class="category-container">
-                <t-radio-group v-model="article.category">
-                  <t-radio
-                    v-for="item in categoryOptions"
-                    :value="item.id"
-                    :key="item.id"
-                    >{{ item.name }}</t-radio
-                  >
-                </t-radio-group>
+                <t-checkbox-group
+                  v-model="article.categories"
+                  :options="categoryOptions"
+                ></t-checkbox-group>
                 <div class="create-category-container">
                   <div class="create-category-button-container">
                     <t-button
@@ -150,11 +147,11 @@
                 @create="handleCreateTag"
               />
             </t-form-item>
-            <t-form-item label="摘要" name="digest">
+            <t-form-item label="摘要" name="summary">
               <t-textarea
-                v-model="article.digest"
+                v-model="article.summary"
                 placeholder="若不填写，将会从文章中自动截取"
-                name="digest"
+                name="summary"
                 :autosize="{ minRows: 6 }"
               />
             </t-form-item>
@@ -197,7 +194,7 @@
             </t-form-item>
             <t-form-item label="SEO 关键字" name="keywords">
               <t-select
-                v-model="article.tags"
+                v-model="article.seoKeywords"
                 creatable
                 filterable
                 multiple
@@ -209,9 +206,9 @@
             </t-form-item>
             <t-form-item label="SEO 描述" name="description">
               <t-textarea
-                v-model="article.digest"
+                v-model="article.seoDescription"
                 placeholder="若不填写，将使用摘要作为描述"
-                name="digest"
+                name="seoDescription"
                 :autosize="{ minRows: 6 }"
               />
             </t-form-item>
@@ -249,23 +246,18 @@ export default {
         slug: "",
         allowedComment: true,
         isTop: false,
-        category: 0,
+        categories: [],
         tags: [],
-        // TODO: 直接用这个 tag 提交会有问题，只有新增没有删除
-        digest: "",
+        summary: "",
         cover: "",
         password: "",
+        wordCount: 0,
         seoKeywords: [],
         seoDescription: "",
+        status: 0,
       },
       categoryOptions: [],
-      tagOptions: [
-        { label: "Kubernetes", value: "Kubernetes" },
-        { label: "Docker", value: "Docker" },
-        { label: "LeetCode", value: "LeetCode" },
-        { label: "中文1", value: "中文1" },
-        { label: "中文2", value: "中文2" },
-      ],
+      tagOptions: [],
       seoKeywordOptions: [],
       showAddCategoryForm: false,
       newCategory: {
@@ -275,11 +267,14 @@ export default {
     };
   },
   methods: {
+    // get content from sub component Vditor
     onContentChange(originalContent, formatContent) {
       this.article.originalContent = originalContent;
       this.article.formatContent = formatContent;
-      console.log(this.article.originalContent);
-      console.log(this.article.formatContent);
+    },
+    // get word count from sub component Vditor
+    countWord(length) {
+      this.article.wordCount = length;
     },
     saveDraft() {
       console.log("保存草稿");
@@ -297,31 +292,21 @@ export default {
         return;
       }
       this.$request
-        .post("/article", this.article)
+        .post("article", this.article)
         .then((res) => {
           if (res.status === 0) {
             this.$message.success("发布成功");
-          } else {
-            this.$message.error(res.msg);
+            this.$router.push({ name: "ArticleList" });
           }
         })
-        .catch((err) => {
-          this.$message.error(err.msg);
+        .catch(() => {
+          this.$message.warning("发布失败");
         });
     },
-    handleCreateTag(value) {
-      this.tagOptions.push({
-        value,
-        label: value,
-      });
-    },
-    createSEOKeyword(value) {
-      this.seoKeywordOptions.push({
-        value,
-        label: value,
-      });
-    },
     handleCreateCategory() {
+      // remove whitespace
+      this.newCategory.name = this.newCategory.name.replace(/\s*/g, "");
+      this.newCategory.slug = this.newCategory.slug.replace(/\s*/g, "");
       if (this.newCategory.name === "") {
         this.$message.warning("分类名称不能为空");
         return;
@@ -333,45 +318,77 @@ export default {
       this.$request
         .post("category", this.newCategory)
         .then((res) => {
-          console.log("res", res);
           if (res.status === 0) {
-            this.$message.success("添加分类成功");
+            this.$message.success("创建分类成功");
             this.categoryOptions.push({
-              id: res.data.id,
-              name: res.data.name,
+              value: res.data.id,
+              label: res.data.name,
             });
-            this.showAddCategoryForm = false;
+            this.cancelCreateCategory();
           }
         })
-        .catch((err) => {
-          console.log("err", err);
-          this.$message.error(err.msg);
+        .catch(() => {
+          this.$message.warning("创建分类失败");
         });
     },
     cancelCreateCategory() {
+      this.newCategory.name = "";
+      this.newCategory.slug = "";
       this.showAddCategoryForm = false;
+    },
+    handleCreateTag(value) {
+      value = value.replace(/\s*/g, "");
+      if (value === "") {
+        this.$message.warning("标签不能为空");
+        return;
+      }
+      var newTag = {
+        name: value,
+        slug: value,
+      };
+      this.$request
+        .post("tag", newTag)
+        .then((res) => {
+          this.$message.success("创建标签成功");
+          this.tagOptions.push({
+            value: res.data.id,
+            label: res.data.name,
+          });
+        })
+        .catch(() => {
+          this.article.tags.splice(this.article.tags.indexOf(value), 1);
+          this.$message.success("创建标签失败");
+        });
+    },
+    createSEOKeyword(value) {
+      this.seoKeywordOptions.push({
+        value,
+        label: value,
+      });
     },
   },
   components: { Vditor, Icon, AddIcon },
   mounted() {
-    this.$request
-      .get("categories")
-      .then((res) => {
-        console.log("res", res);
-        if (res.status === 0) {
-          res.data.forEach((category) => {
-            this.categoryOptions.push({
-              id: category.ID,
-              name: category.name,
-              slug: category.slug,
-            });
-          });
-        }
-      })
-      .catch((err) => {
-        console.log("err", err);
-        this.$message.error("获取分类列表失败");
+    // list categories
+    this.$request.get("categories").then((res) => {
+      res.data.forEach((category) => {
+        this.categoryOptions.push({
+          value: category.id,
+          label: category.name,
+        });
       });
+    });
+
+    // list tags
+    this.$request.get("tags").then((res) => {
+      console.log("res", res);
+      res.data.forEach((tag) => {
+        this.tagOptions.push({
+          value: tag.id,
+          label: tag.name,
+        });
+      });
+    });
   },
 };
 </script>

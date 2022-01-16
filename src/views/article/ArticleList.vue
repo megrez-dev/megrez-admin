@@ -14,7 +14,7 @@
         :columns="columns"
         :rowKey="rowKey"
         :verticalAlign="verticalAlign"
-        :loading="isLoading"
+        :loading="isArticleListLoading"
         :pagination="pagination"
         @change="rehandleChange"
       >
@@ -36,7 +36,7 @@ export default {
   data() {
     return {
       data: [],
-      isLoading: false,
+      isArticleListLoading: false,
       columns: [
         {
           width: 200,
@@ -87,7 +87,7 @@ export default {
   methods: {
     async fetchData(pagination = this.pagination) {
       try {
-        this.isLoading = true;
+        this.isArticleListLoading = true;
         const { current, pageSize } = pagination;
         // 请求可能存在跨域问题
         const url = new URL("https://randomuser.me/api");
@@ -104,7 +104,7 @@ export default {
       } catch (err) {
         this.data = [];
       }
-      this.isLoading = false;
+      this.isArticleListLoading = false;
     },
     // 也可以使用 page-change 事件
     async rehandleChange(changeParams, triggerAndData) {

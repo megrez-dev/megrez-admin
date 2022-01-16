@@ -10,18 +10,14 @@ const API_HOST = host['dev'].API
 
 const CODE = {
     SUCCESS: 0,
-    ERROR:-1,
+    ERROR: -1,
 };
-
-axios.defaults.withCredentials = false
 
 const instance = axios.create({
     baseURL: API_HOST,
-    timeout: 1000,
-    withCredentials: true,
+    timeout: 10000,
+    withCredentials: false,
 });
-
-instance.interceptors.retry = 3;
 
 // instance.interceptors.request.use(
 //     config => {
@@ -43,34 +39,22 @@ instance.interceptors.response.use(
         if (response.status === 200) {
             if (response.data.status === CODE.SUCCESS) {
                 return response.data;
-            }else {
-                console.log("response.data", response.data)
-                return Promise.reject(response.data);
+            } else {
+                if (response.data && response.data.msg) {
+                    MessagePlugin.warning(response.data.msg)
+                }else {
+                    MessagePlugin.warning("请求错误")
+                }
+                return Promise.reject(response);
             }
-        }else {
-            MessagePlugin.error('请求失败')
+        } else {
+            MessagePlugin.error('请求失败');
+            return Promise.reject(response);
         }
     },
     (err) => {
-        const { config } = err;
-
-        if (!config || !config.retry) return Promise.reject(err);
-
-        config.retryCount = config.retryCount || 0;
-
-        if (config.retryCount >= config.retry) {
-            return Promise.reject(err);
-        }
-
-        config.retryCount += 1;
-
-        const backoff = new Promise((resolve) => {
-            setTimeout(() => {
-                resolve({});
-            }, config.retryDelay || 1);
-        });
-
-        return backoff.then(() => instance(config));
+        MessagePlugin.error('请求失败')
+        return Promise.reject(err);
     },
 );
 
