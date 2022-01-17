@@ -18,11 +18,13 @@
         :pagination="pagination"
         @change="rehandleChange"
       >
-      <template #op="slotProps">
-            <a class="t-button-link" @click="handleClickDetail()">编辑</a>
-            <t-divider layout="vertical" />
-            <a class="t-button-link" @click="handleClickRecyle(slotProps)">回收站</a>
-          </template>
+        <template #op="slotProps">
+          <a class="t-button-link" @click="handleClickDetail()">编辑</a>
+          <t-divider layout="vertical" />
+          <a class="t-button-link" @click="handleClickRecyle(slotProps)"
+            >回收站</a
+          >
+        </template>
       </t-table>
     </div>
   </div>
@@ -40,35 +42,47 @@ export default {
       columns: [
         {
           width: 200,
-          colKey: "name",
-          title: "姓名",
-          render(h, { row: { name } }) {
-            return name ? `${name.first} ${name.last}` : "UNKNOW_USER";
+          colKey: "title",
+          title: "标题",
+          render(h, { row: { title } }) {
+            return title;
           },
         },
         {
           width: 200,
-          colKey: "gender",
-          title: "性别",
+          colKey: "status",
+          title: "状态",
         },
         {
           width: 200,
-          colKey: "phone",
-          title: "联系方式",
-          render(h, { row: { phone } }) {
-            return phone;
-          },
+          colKey: "categories",
+          title: "分类",
         },
         {
-          width: 260,
-          colKey: "email",
-          title: "邮箱",
-        },
-        {
-          fixed: 'right',
           width: 200,
-          colKey: 'op',
-          title: '操作',
+          colKey: "tags",
+          title: "标签",
+        },
+        {
+          width: 200,
+          colKey: "comments",
+          title: "评论",
+        },
+        {
+          width: 200,
+          colKey: "visits",
+          title: "访问量",
+        },
+        {
+          width: 200,
+          colKey: "publishTime",
+          title: "发布时间",
+        },
+        {
+          fixed: "right",
+          width: 200,
+          colKey: "op",
+          title: "操作",
         },
       ],
       rowKey: "property",
@@ -81,44 +95,34 @@ export default {
       },
     };
   },
-  async mounted() {
-    await this.fetchData(this.pagination);
+  mounted() {
+    this.listArticles(this.pagination);
   },
   methods: {
-    async fetchData(pagination = this.pagination) {
-      try {
-        this.isArticleListLoading = true;
-        const { current, pageSize } = pagination;
-        // 请求可能存在跨域问题
-        const url = new URL("https://randomuser.me/api");
-        const params = { page: current, results: pageSize };
-        Object.keys(params).forEach((key) =>
-          url.searchParams.append(key, params[key])
-        );
-        const response = await fetch(url).then((x) => x.json());
-        this.data = response.results;
-        this.pagination = {
-          ...pagination,
-          total: 120,
-        };
-      } catch (err) {
-        this.data = [];
-      }
-      this.isArticleListLoading = false;
+    listArticles(pagination = this.pagination) {
+      this.isArticleListLoading = true;
+      const { current, pageSize } = pagination;
+      this.$request
+        .get("articles?pageNum=" + current + "&pageSize=" + pageSize)
+        .then((res) => {
+          this.data = res.data;
+          this.pagination = {
+            ...pagination,
+            total: res.data.total,
+          };
+        })
+        .catch((err) => {
+          console.log(err);
+        })
+        .finally(() => {
+          this.isArticleListLoading = false;
+        });
     },
-    // 也可以使用 page-change 事件
-    async rehandleChange(changeParams, triggerAndData) {
-      console.log(
-        "分页、排序、过滤等发生变化时会触发 change 事件：",
-        changeParams,
-        triggerAndData
-      );
-      const { current, pageSize } = changeParams.pagination;
-      const pagination = { current, pageSize };
-      await this.fetchData(pagination);
+    rehandleChange(changeParams) {
+      this.pagination = changeParams.pagination;
     },
   },
-  components: {AddIcon}
+  components: { AddIcon },
 };
 </script>
 <style lang="less" scoped>
@@ -138,10 +142,10 @@ export default {
       margin-bottom: 16px;
     }
     .t-button-link {
-        color: @brand-color;
-        text-decoration: none;
-        cursor: pointer;
-        transition: color .2s cubic-bezier(.38,0,.24,1);
+      color: @brand-color;
+      text-decoration: none;
+      cursor: pointer;
+      transition: color 0.2s cubic-bezier(0.38, 0, 0.24, 1);
     }
   }
 }
