@@ -10,7 +10,7 @@
         </div>
       </t-row>
       <t-table
-        :data="data"
+        :data="articleList"
         :columns="columns"
         :rowKey="rowKey"
         :verticalAlign="verticalAlign"
@@ -37,7 +37,7 @@ export default {
   name: "ArticleList",
   data() {
     return {
-      data: [],
+      articleList: [],
       isArticleListLoading: false,
       columns: [
         {
@@ -57,11 +57,33 @@ export default {
           width: 200,
           colKey: "categories",
           title: "分类",
+          render(h, { row: { categories } }) {
+            var categoriesStr = ''
+            categories.forEach(category => {
+              if (categoriesStr === '') {
+                categoriesStr = category.name
+              }else {
+                categoriesStr = categoriesStr + "," + category.name
+              }
+            });
+            return categoriesStr;
+          },
         },
         {
           width: 200,
           colKey: "tags",
           title: "标签",
+          render(h, { row: { tags } }) {
+            var tagsStr = ''
+            tags.forEach(tag => {
+              if (tagsStr === '') {
+                tagsStr = tag.name
+              }else {
+                tagsStr = tagsStr + "," + tag.name
+              }
+            });
+            return tagsStr;
+          },
         },
         {
           width: 200,
@@ -105,7 +127,8 @@ export default {
       this.$request
         .get("articles?pageNum=" + current + "&pageSize=" + pageSize)
         .then((res) => {
-          this.data = res.data;
+          console.log(res.data)
+          this.articleList = res.data.list;
           this.pagination = {
             ...pagination,
             total: res.data.total,
@@ -118,8 +141,19 @@ export default {
           this.isArticleListLoading = false;
         });
     },
-    rehandleChange(changeParams) {
-      this.pagination = changeParams.pagination;
+    rehandleChange(pageInfo) {
+      console.log("pageInfo", pageInfo);
+      this.pagination.current = pageInfo.pagination.current;
+      this.pagination.pageSize = pageInfo.pagination.pageSize;
+      this.listArticles(this.pagination);
+    },
+    handleClickDetail(slotProps) {
+      console.log("slogProps", slotProps)
+      console.log("编辑");
+    },
+    handleClickRecyle(slotProps) {
+      console.log("slogProps", slotProps)
+      console.log("回收站")
     },
   },
   components: { AddIcon },

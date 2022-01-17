@@ -381,7 +381,6 @@ export default {
 
     // list tags
     this.$request.get("tags").then((res) => {
-      console.log("res", res);
       res.data.forEach((tag) => {
         this.tagOptions.push({
           value: tag.id,
