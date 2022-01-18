@@ -354,6 +354,8 @@ export default {
             value: res.data.id,
             label: res.data.name,
           });
+          this.article.tags.splice(this.article.tags.indexOf(value), 1);
+          this.article.tags.push(res.data.id);
         })
         .catch(() => {
           this.article.tags.splice(this.article.tags.indexOf(value), 1);

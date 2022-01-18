@@ -87,7 +87,7 @@ export default {
         },
         {
           width: 200,
-          colKey: "comments",
+          colKey: "commentsNum",
           title: "评论",
         },
         {
