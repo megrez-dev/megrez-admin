@@ -32,6 +32,7 @@
 
 <script>
 import { AddIcon } from "tdesign-icons-vue";
+import { timeAgo } from "@/utils/datetime.js";
 
 export default {
   name: "ArticleList",
@@ -49,7 +50,7 @@ export default {
           },
         },
         {
-          width: 200,
+          width: 100,
           colKey: "status",
           title: "状态",
         },
@@ -58,12 +59,12 @@ export default {
           colKey: "categories",
           title: "分类",
           render(h, { row: { categories } }) {
-            var categoriesStr = ''
-            categories.forEach(category => {
-              if (categoriesStr === '') {
-                categoriesStr = category.name
-              }else {
-                categoriesStr = categoriesStr + "," + category.name
+            var categoriesStr = "";
+            categories.forEach((category) => {
+              if (categoriesStr === "") {
+                categoriesStr = category.name;
+              } else {
+                categoriesStr = categoriesStr + "," + category.name;
               }
             });
             return categoriesStr;
@@ -74,35 +75,38 @@ export default {
           colKey: "tags",
           title: "标签",
           render(h, { row: { tags } }) {
-            var tagsStr = ''
-            tags.forEach(tag => {
-              if (tagsStr === '') {
-                tagsStr = tag.name
-              }else {
-                tagsStr = tagsStr + "," + tag.name
+            var tagsStr = "";
+            tags.forEach((tag) => {
+              if (tagsStr === "") {
+                tagsStr = tag.name;
+              } else {
+                tagsStr = tagsStr + "," + tag.name;
               }
             });
             return tagsStr;
           },
         },
         {
-          width: 200,
+          width: 100,
           colKey: "commentsNum",
           title: "评论",
         },
         {
-          width: 200,
+          width: 100,
           colKey: "visits",
           title: "访问量",
         },
         {
-          width: 200,
+          width: 100,
           colKey: "publishTime",
           title: "发布时间",
+          render(h, { row: { publishTime } }) {
+            return timeAgo(publishTime);
+          },
         },
         {
           fixed: "right",
-          width: 200,
+          width: 300,
           colKey: "op",
           title: "操作",
         },
@@ -127,7 +131,7 @@ export default {
       this.$request
         .get("articles?pageNum=" + current + "&pageSize=" + pageSize)
         .then((res) => {
-          console.log(res.data)
+          console.log(res.data);
           this.articleList = res.data.list;
           this.pagination = {
             ...pagination,
@@ -148,12 +152,12 @@ export default {
       this.listArticles(this.pagination);
     },
     handleClickDetail(slotProps) {
-      console.log("slogProps", slotProps)
+      console.log("slogProps", slotProps);
       console.log("编辑");
     },
     handleClickRecyle(slotProps) {
-      console.log("slogProps", slotProps)
-      console.log("回收站")
+      console.log("slogProps", slotProps);
+      console.log("回收站");
     },
   },
   components: { AddIcon },
