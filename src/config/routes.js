@@ -52,4 +52,16 @@ export const routes = [
         name: 'Comment',
         meta: { title: '评论', icon: 'edit-1' }
     },
+    {
+        path: '/login',
+        name: 'Login',
+        meta: { title: '登录' },
+        component: () => import('@/views/user/Login')
+      },
+      {
+        path: '/install',
+        name: 'Install',
+        meta: { title: '安装向导' },
+        component: () => import('@/views/system/Install')
+      },
 ]

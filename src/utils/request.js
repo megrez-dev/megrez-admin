@@ -11,6 +11,7 @@ const API_HOST = host['dev'].API
 const CODE = {
     SUCCESS: 0,
     ERROR: -1,
+    NOT_INSTALL: 2,
 };
 
 const instance = axios.create({
@@ -39,7 +40,10 @@ instance.interceptors.response.use(
         if (response.status === 200) {
             if (response.data.status === CODE.SUCCESS) {
                 return response.data;
-            } else {
+            } else if (response.data.status === CODE.NOT_INSTALL){
+                MessagePlugin.warning("请先安装系统");
+                return Promise.reject(response);
+            }else {
                 if (response.data && response.data.msg) {
                     MessagePlugin.warning(response.data.msg)
                 }else {
