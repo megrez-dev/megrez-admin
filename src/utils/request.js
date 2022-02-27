@@ -1,5 +1,6 @@
 import axios from 'axios';
 import host from '@/config/host';
+import router from '@/router'
 // import store from '@/store'
 import { MessagePlugin } from 'tdesign-vue';
 
@@ -41,13 +42,14 @@ instance.interceptors.response.use(
             if (response.data.status === CODE.SUCCESS) {
                 return response.data;
             } else if (response.data.status === CODE.NOT_INSTALL){
-                MessagePlugin.warning("请先安装系统");
+                MessagePlugin.warning('请先安装系统');
+                router.push({ name: 'Install' });
                 return Promise.reject(response);
             }else {
                 if (response.data && response.data.msg) {
                     MessagePlugin.warning(response.data.msg)
                 }else {
-                    MessagePlugin.warning("请求错误")
+                    MessagePlugin.warning('请求错误')
                 }
                 return Promise.reject(response);
             }
@@ -58,6 +60,7 @@ instance.interceptors.response.use(
     },
     (err) => {
         MessagePlugin.error('请求失败')
+        console.log(err)
         return Promise.reject(err);
     },
 );
