@@ -37,7 +37,7 @@
 
 <script>
 import { Icon } from "tdesign-icons-vue";
-import { routes } from "@/config/routes.js";
+import { menuRoutes } from "@/config/routes.js";
 
 export default {
   components: { Icon },
@@ -53,7 +53,7 @@ export default {
       }
     },
     menu() {
-      return routes;
+      return menuRoutes.find(item => item.path === '/').children;
     },
   },
 };

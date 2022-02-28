@@ -14,7 +14,7 @@
     "less-loader": "^7.3.0",
     "node-sass": "^7.0.1",
     "sass-loader": "^7.3.0",
-    "tdesign-vue": "^0.32.0",
+    "tdesign-vue": "^0.35.1",
     "vditor": "^3.8.10",
     "vue": "^2.6.11",
     "vue-ls": "^4.0.0",

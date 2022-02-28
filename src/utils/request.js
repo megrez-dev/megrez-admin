@@ -42,7 +42,7 @@ instance.interceptors.response.use(
             if (response.data.status === CODE.SUCCESS) {
                 return response.data;
             } else if (response.data.status === CODE.NOT_INSTALL){
-                MessagePlugin.warning('请先安装系统');
+                MessagePlugin.warning('请先安装博客');
                 router.push({ name: 'Install' });
                 return Promise.reject(response);
             }else {
