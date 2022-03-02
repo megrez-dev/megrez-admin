@@ -21,21 +21,6 @@ const instance = axios.create({
     withCredentials: false,
 });
 
-// instance.interceptors.request.use(
-//     config => {
-//         const token = store.getters.token
-//         if (token && token.access_token) {
-//             config.headers['Admin-Authorization'] = token.access_token
-//         }
-//         return config
-//     },
-//     error => {
-//         console.log('request error', error)
-//         MessagePlugin.error('网络请求失败')
-//         return Promise.reject(error)
-//     }
-// )
-
 instance.interceptors.response.use(
     (response) => {
         if (response.status === 200) {
@@ -54,12 +39,12 @@ instance.interceptors.response.use(
                 return Promise.reject(response);
             }
         } else {
-            MessagePlugin.error('请求失败');
+            MessagePlugin.error('网络请求失败');
             return Promise.reject(response);
         }
     },
     (err) => {
-        MessagePlugin.error('请求失败')
+        MessagePlugin.error('网络请求失败')
         console.log(err)
         return Promise.reject(err);
     },

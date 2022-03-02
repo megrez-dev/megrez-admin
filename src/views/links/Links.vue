@@ -42,7 +42,7 @@
                   :options="courseOptions"
                 ></t-checkbox-group>
               </t-form-item>
-              <t-form-item style="padding-top: 8px">
+              <t-form-item>
                 <t-button
                   theme="primary"
                   type="submit"

@@ -114,7 +114,7 @@
                         </t-form-item>
                       </div>
                       <div class="create-category-form-item">
-                        <t-form-item style="padding-top: 8px">
+                        <t-form-item>
                           <t-button
                             theme="primary"
                             style="margin-right: 10px"
@@ -301,6 +301,7 @@ export default {
         })
         .catch(() => {
           this.$message.warning("发布失败");
+          // TODO: 换成修改按钮状态
         });
     },
     handleCreateCategory() {
@@ -329,6 +330,7 @@ export default {
         })
         .catch(() => {
           this.$message.warning("创建分类失败");
+          // TODO: 换成修改按钮状态
         });
     },
     cancelCreateCategory() {
@@ -360,6 +362,7 @@ export default {
         .catch(() => {
           this.article.tags.splice(this.article.tags.indexOf(value), 1);
           this.$message.success("创建标签失败");
+          // TODO: 换成修改按钮状态
         });
     },
     createSEOKeyword(value) {
