@@ -1,6 +1,8 @@
+import Vue from 'vue'
 import axios from 'axios';
 import host from '@/config/host';
 import router from '@/router'
+import { ACCESS_TOKEN } from '@/store/mutation-types'
 // import store from '@/store'
 import { MessagePlugin } from 'tdesign-vue';
 
@@ -13,6 +15,11 @@ const CODE = {
     SUCCESS: 0,
     ERROR: -1,
     NOT_INSTALL: 2,
+
+    TOKEN_NOT_EXIST: 1004,
+    TOKEN_INVALID: 1005,
+    TOKEN_EXPIRED: 1006,
+
 };
 
 const instance = axios.create({
@@ -21,19 +28,34 @@ const instance = axios.create({
     withCredentials: false,
 });
 
+axios.interceptors.request.use(function (config) {
+    let token = Vue.ls.get(ACCESS_TOKEN)
+    config.headers.common['Megrez-Token'] = token;
+    //console.dir(config);
+    return config;
+}, function (error) {
+    MessagePlugin.error('请求失败');
+    return Promise.reject(error);
+});
+
 instance.interceptors.response.use(
     (response) => {
         if (response.status === 200) {
             if (response.data.status === CODE.SUCCESS) {
                 return response.data;
-            } else if (response.data.status === CODE.NOT_INSTALL){
+            } else if (response.data.status === CODE.NOT_INSTALL) {
                 MessagePlugin.warning('请先安装博客');
                 router.push({ name: 'Install' });
                 return Promise.reject(response);
-            }else {
+            } else if (response.data.status === CODE.TOKEN_NOT_EXIST || response.data.status === CODE.TOKEN_INVALID || response.data.status === CODE.TOKEN_EXPIRED) {
+                MessagePlugin.warning('请先登录');
+                router.push({ name: 'Login' });
+                return Promise.reject(response);
+                // TODO: CODE.TOKEN_INVALID, TOKEN_EXPIRED 弹出登录框重新校验
+            } else {
                 if (response.data && response.data.msg) {
                     MessagePlugin.warning(response.data.msg)
-                }else {
+                } else {
                     MessagePlugin.warning('请求错误')
                 }
                 return Promise.reject(response);

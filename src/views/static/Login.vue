@@ -1,7 +1,13 @@
 <template>
   <div class="login-card-container">
     <h1 style="text-align: center">Megrez</h1>
-    <t-form :data="loginForm" ref="loginForm" labelWidth="0" :rules="rules" @submit="onSubmit">
+    <t-form
+      :data="loginForm"
+      ref="loginForm"
+      labelWidth="0"
+      :rules="rules"
+      @submit="onSubmit"
+    >
       <t-form-item name="username">
         <t-input
           v-model="loginForm.username"
@@ -57,8 +63,10 @@ export default {
     },
     onSubmit({ validateResult, firstError }) {
       if (validateResult === true) {
-        this.$request.post("login", this.loginForm).then(() => {
+        this.$request.post("login", this.loginForm).then((res) => {
           this.$message.success("登录成功");
+          console.log('token', res.data)
+          this.$store.commit("SET_TOKEN", res.data);
           this.$router.push({ name: "Overview" });
         });
       } else {

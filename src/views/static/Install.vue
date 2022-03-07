@@ -3,6 +3,7 @@
     <t-form
       :data="installForm"
       labelWidth="0"
+      ref="installForm"
       :rules="rules"
       @submit="onSubmit"
     >
@@ -12,17 +13,29 @@
         </div></t-divider
       >
       <t-form-item name="username">
-        <t-input v-model="installForm.username" placeholder="用户名">
+        <t-input
+          v-model="installForm.username"
+          placeholder="用户名"
+          @enter="handleInstall"
+        >
           <user-icon slot="prefix-icon"></user-icon>
         </t-input>
       </t-form-item>
       <t-form-item name="nickname">
-        <t-input v-model="installForm.nickname" placeholder="昵称">
+        <t-input
+          v-model="installForm.nickname"
+          placeholder="昵称"
+          @enter="handleInstall"
+        >
           <user-icon slot="prefix-icon"></user-icon>
         </t-input>
       </t-form-item>
       <t-form-item name="email">
-        <t-input v-model="installForm.email" placeholder="邮箱">
+        <t-input
+          v-model="installForm.email"
+          placeholder="邮箱"
+          @enter="handleInstall"
+        >
           <mail-icon slot="prefix-icon"></mail-icon>
         </t-input>
       </t-form-item>
@@ -31,6 +44,7 @@
           type="password"
           v-model="installForm.password"
           placeholder="密码"
+          @enter="handleInstall"
         >
           <lock-on-icon slot="prefix-icon"></lock-on-icon>
         </t-input>
@@ -40,6 +54,7 @@
           type="password"
           v-model="installForm.confirmPassword"
           placeholder="确认密码"
+          @enter="handleInstall"
         >
           <lock-on-icon slot="prefix-icon"></lock-on-icon>
         </t-input>
@@ -50,18 +65,26 @@
         </div></t-divider
       >
       <t-form-item name="blogURL">
-        <t-input v-model="installForm.blogURL" placeholder="博客 URL">
+        <t-input
+          v-model="installForm.blogURL"
+          placeholder="博客 URL"
+          @enter="handleInstall"
+        >
           <link-icon slot="prefix-icon"></link-icon>
         </t-input>
       </t-form-item>
       <t-form-item name="blogTitle">
-        <t-input v-model="installForm.blogTitle" placeholder="博客标题">
+        <t-input
+          v-model="installForm.blogTitle"
+          placeholder="博客标题"
+          @enter="handleInstall"
+        >
           <books-icon slot="prefix-icon"></books-icon>
         </t-input>
       </t-form-item>
       <t-form-item>
         <t-button theme="primary" type="submit" size="large" style="width: 100%"
-          >提交</t-button
+          >安装</t-button
         >
       </t-form-item>
     </t-form>
@@ -125,6 +148,9 @@ export default {
   },
 
   methods: {
+    handleInstall() {
+      this.$refs.installForm.submit();
+    },
     onSubmit({ validateResult, firstError }) {
       if (validateResult === true) {
         this.$request

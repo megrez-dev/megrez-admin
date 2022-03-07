@@ -361,7 +361,7 @@ export default {
         })
         .catch(() => {
           this.article.tags.splice(this.article.tags.indexOf(value), 1);
-          this.$message.success("创建标签失败");
+          this.$message.error("创建标签失败");
           // TODO: 换成修改按钮状态
         });
     },
