@@ -28,14 +28,11 @@ const instance = axios.create({
     withCredentials: false,
 });
 
-axios.interceptors.request.use(function (config) {
+instance.interceptors.request.use(function (config) {
     let token = Vue.ls.get(ACCESS_TOKEN)
-    config.headers.common['Megrez-Token'] = token;
-    //console.dir(config);
+    config.headers.Authorization = token;
+    console.log("token:", token)
     return config;
-}, function (error) {
-    MessagePlugin.error('请求失败');
-    return Promise.reject(error);
 });
 
 instance.interceptors.response.use(

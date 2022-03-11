@@ -65,7 +65,6 @@ export default {
       if (validateResult === true) {
         this.$request.post("login", this.loginForm).then((res) => {
           this.$message.success("登录成功");
-          console.log('token', res.data)
           this.$store.commit("SET_TOKEN", res.data);
           this.$router.push({ name: "Overview" });
         });
