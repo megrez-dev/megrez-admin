@@ -31,7 +31,6 @@ const instance = axios.create({
 instance.interceptors.request.use(function (config) {
     let token = Vue.ls.get(ACCESS_TOKEN)
     config.headers.Authorization = token;
-    console.log("token:", token)
     return config;
 });
 
