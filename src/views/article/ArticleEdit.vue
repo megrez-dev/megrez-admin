@@ -16,11 +16,6 @@
           >
         </span>
         <span class="article-edit-bar-operator-item">
-          <t-button theme="primary" variant="base" @click="preview"
-            >预览</t-button
-          >
-        </span>
-        <span class="article-edit-bar-operator-item">
           <t-button theme="primary" variant="base" @click="handlePublish"
             >发布</t-button
           >
@@ -267,6 +262,13 @@ export default {
     };
   },
   methods: {
+    // TODO: start here
+    // beforeRouteEnter(to, from, next) {
+    //   // get article id from query
+    //   const articleID = to.query.articleID;
+    //   // get article from server
+
+    // },
     // get content from sub component Vditor
     onContentChange(originalContent, formatContent) {
       this.article.originalContent = originalContent;
@@ -277,10 +279,24 @@ export default {
       this.article.wordCount = length;
     },
     saveDraft() {
-      console.log("保存草稿");
-    },
-    preview() {
-      console.log("预览");
+      //validate
+      if (this.article.title === "") {
+        this.$message.warning("文章标题不能为空");
+        return;
+      }
+      this.article.status = 1;
+      this.$request
+        .post("article", this.article)
+        .then((res) => {
+          if (res.status === 0) {
+            this.$message.success("保存成功");
+            this.$router.push({ name: "ArticleList" });
+          }
+        })
+        .catch(() => {
+          this.$message.warning("保存失败");
+          // TODO: 换成修改按钮状态
+        });
     },
     openDrawer() {
       this.attachDrawerVisible = true;
@@ -291,6 +307,7 @@ export default {
         this.$message.warning("文章标题不能为空");
         return;
       }
+      this.article.status = 0;
       this.$request
         .post("article", this.article)
         .then((res) => {

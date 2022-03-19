@@ -3,7 +3,7 @@
     <div class="card-container">
       <t-row justify="space-between">
         <div class="left-operation-container">
-          <t-button>
+          <t-button @click="handleWrite">
             <add-icon slot="icon" />
             写文章
           </t-button>
@@ -19,7 +19,7 @@
         @change="rehandleChange"
       >
         <template #op="slotProps">
-          <a class="t-button-link" @click="handleClickDetail()">编辑</a>
+          <a class="t-button-link" @click="handleClickDetail(slotProps)">编辑</a>
           <t-divider layout="vertical" />
           <a class="t-button-link" @click="handleClickRecyle(slotProps)"
             >回收站</a
@@ -151,8 +151,12 @@ export default {
       this.pagination.pageSize = pageInfo.pagination.pageSize;
       this.listArticles(this.pagination);
     },
+    handleWrite() {
+      this.$router.push({ name: "ArticleEdit" });
+    },
     handleClickDetail(slotProps) {
       console.log("slogProps", slotProps);
+      this.$router.push({ name: 'ArticleEdit', query: { articleID: slotProps.record.id } })
       console.log("编辑");
     },
     handleClickRecyle(slotProps) {
