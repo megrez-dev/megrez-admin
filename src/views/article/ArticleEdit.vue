@@ -10,12 +10,20 @@
             >附件</t-button
           >
         </span>
-        <span class="article-edit-bar-operator-item">
+        <span class="article-edit-bar-operator-item" v-if="article.status != 1">
           <t-button theme="danger" variant="base" @click="saveDraft"
-            >保存草稿</t-button
+            >存为草稿</t-button
           >
         </span>
-        <span class="article-edit-bar-operator-item">
+        <span class="article-edit-bar-operator-item" v-if="state != 0">
+          <t-button theme="primary" variant="base" @click="handleUpdate"
+            >更新</t-button
+          >
+        </span>
+        <span
+          class="article-edit-bar-operator-item"
+          v-if="!(state === 1 && article.status === 0)"
+        >
           <t-button theme="primary" variant="base" @click="handlePublish"
             >发布</t-button
           >
@@ -231,9 +239,30 @@ import { Icon, AddIcon } from "tdesign-icons-vue";
 
 export default {
   name: "ArticleEdit",
+  beforeRouteEnter(to, from, next) {
+    // get article id from query
+    const articleID = to.query.articleID;
+    // get article from server
+    next((vm) => {
+      if (articleID) {
+        vm.state = 1;
+        vm.$request
+          .get("article/" + articleID)
+          .then((res) => {
+            console.log("res:", res);
+            vm.article = res.data;
+          })
+          .catch(() => {
+            this.$message.warning("获取文章失败");
+          });
+      }
+    });
+  },
   data() {
     return {
       attachDrawerVisible: false,
+      // 0 for create, 1 for edit
+      state: 0,
       article: {
         title: "",
         originalContent: "",
@@ -262,13 +291,6 @@ export default {
     };
   },
   methods: {
-    // TODO: start here
-    // beforeRouteEnter(to, from, next) {
-    //   // get article id from query
-    //   const articleID = to.query.articleID;
-    //   // get article from server
-
-    // },
     // get content from sub component Vditor
     onContentChange(originalContent, formatContent) {
       this.article.originalContent = originalContent;
@@ -284,22 +306,57 @@ export default {
         this.$message.warning("文章标题不能为空");
         return;
       }
-      this.article.status = 1;
+      if (this.state === 0) {
+        this.article.status = 1;
+        this.$request
+          .post("article", this.article)
+          .then((res) => {
+            if (res.status === 0) {
+              this.$message.success("保存成功");
+              this.$router.push({ name: "ArticleList" });
+            }
+          })
+          .catch(() => {
+            this.$message.warning("保存失败");
+            // TODO: 换成修改按钮状态
+          });
+      } else {
+        this.article.status = 1;
+        this.$request
+          .put("article/" + this.article.id, this.article)
+          .then((res) => {
+            if (res.status === 0) {
+              this.$message.success("保存成功");
+              this.$router.push({ name: "ArticleList" });
+            }
+          })
+          .catch(() => {
+            this.$message.warning("保存失败");
+            // TODO: 换成修改按钮状态
+          });
+      }
+    },
+    openDrawer() {
+      this.attachDrawerVisible = true;
+    },
+    handleUpdate() {
+      //validate
+      if (this.article.title === "") {
+        this.$message.warning("文章标题不能为空");
+        return;
+      }
       this.$request
-        .post("article", this.article)
+        .put("article/" + this.article.id, this.article)
         .then((res) => {
           if (res.status === 0) {
-            this.$message.success("保存成功");
+            this.$message.success("更新成功");
             this.$router.push({ name: "ArticleList" });
           }
         })
         .catch(() => {
-          this.$message.warning("保存失败");
+          this.$message.warning("更新失败");
           // TODO: 换成修改按钮状态
         });
-    },
-    openDrawer() {
-      this.attachDrawerVisible = true;
     },
     handlePublish() {
       //validate
@@ -308,18 +365,33 @@ export default {
         return;
       }
       this.article.status = 0;
-      this.$request
-        .post("article", this.article)
-        .then((res) => {
-          if (res.status === 0) {
-            this.$message.success("发布成功");
-            this.$router.push({ name: "ArticleList" });
-          }
-        })
-        .catch(() => {
-          this.$message.warning("发布失败");
-          // TODO: 换成修改按钮状态
-        });
+      if (this.state === 0) {
+        this.$request
+          .post("article", this.article)
+          .then((res) => {
+            if (res.status === 0) {
+              this.$message.success("发布成功");
+              this.$router.push({ name: "ArticleList" });
+            }
+          })
+          .catch(() => {
+            this.$message.warning("发布失败");
+            // TODO: 换成修改按钮状态
+          });
+      } else {
+        this.$request
+          .put("article/" + this.article.id, this.article)
+          .then((res) => {
+            if (res.status === 0) {
+              this.$message.success("发布成功");
+              this.$router.push({ name: "ArticleList" });
+            }
+          })
+          .catch(() => {
+            this.$message.warning("发布失败");
+            // TODO: 换成修改按钮状态
+          });
+      }
     },
     handleCreateCategory() {
       // remove whitespace

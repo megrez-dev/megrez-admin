@@ -19,10 +19,12 @@
         @change="rehandleChange"
       >
         <template #op="slotProps">
-          <a class="t-button-link" @click="handleClickDetail(slotProps)">编辑</a>
+          <a class="t-button-link" @click="handleClickDetail(slotProps)"
+            >编辑</a
+          >
           <t-divider layout="vertical" />
-          <a class="t-button-link" @click="handleClickRecyle(slotProps)"
-            >回收站</a
+          <a class="t-button-link" @click="handleClickDelete(slotProps)"
+            >删除</a
           >
         </template>
       </t-table>
@@ -53,6 +55,15 @@ export default {
           width: 100,
           colKey: "status",
           title: "状态",
+          render(h, { row: { status } }) {
+            if (status === 0) {
+              return "已发布";
+            }
+            if (status === 1) {
+              return "草稿";
+            }
+            return "未知";
+          },
         },
         {
           width: 200,
@@ -106,7 +117,7 @@ export default {
         },
         {
           fixed: "right",
-          width: 300,
+          width: 150,
           colKey: "op",
           title: "操作",
         },
@@ -156,12 +167,30 @@ export default {
     },
     handleClickDetail(slotProps) {
       console.log("slogProps", slotProps);
-      this.$router.push({ name: 'ArticleEdit', query: { articleID: slotProps.record.id } })
+      this.$router.push({
+        name: "ArticleEdit",
+        query: { articleID: slotProps.row.id },
+      });
       console.log("编辑");
     },
-    handleClickRecyle(slotProps) {
-      console.log("slogProps", slotProps);
-      console.log("回收站");
+    handleClickDelete(slotProps) {
+      this.$request
+        .delete("article/" + slotProps.row.id)
+        .then((res) => {
+          if (res.status === 0) {
+            for(var i=0;i<this.articleList.length;i++){
+              if(this.articleList[i].id === slotProps.row.id){
+                this.articleList.splice(i,1);
+                break;
+              }
+            }
+            this.$message.success("删除成功");
+          }
+        })
+        .catch(() => {
+          this.$message.warning("删除失败");
+          // TODO: 换成修改按钮状态
+        });
     },
   },
   components: { AddIcon },
