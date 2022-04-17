@@ -44,18 +44,18 @@ export default {
       isArticleListLoading: false,
       columns: [
         {
-          width: 200,
+          // width: 200,
           colKey: "title",
           title: "标题",
-          render(h, { row: { title } }) {
+          cell(h, { row: { title } }) {
             return title;
           },
         },
         {
-          width: 100,
+          // width: 100,
           colKey: "status",
           title: "状态",
-          render(h, { row: { status } }) {
+          cell(h, { row: { status } }) {
             if (status === 0) {
               return "已发布";
             }
@@ -66,58 +66,40 @@ export default {
           },
         },
         {
-          width: 200,
+          // width: 200,
           colKey: "categories",
           title: "分类",
-          render(h, { row: { categories } }) {
-            var categoriesStr = "";
-            categories.forEach((category) => {
-              if (categoriesStr === "") {
-                categoriesStr = category.name;
-              } else {
-                categoriesStr = categoriesStr + "," + category.name;
-              }
-            });
-            return categoriesStr;
+          cell(h, {  row: { categories } }) {
+            return categories.map(({ name }) => name).join(",");
           },
         },
         {
-          width: 200,
+          // width: 200,
           colKey: "tags",
           title: "标签",
-          render(h, { row: { tags } }) {
-            var tagsStr = "";
-            tags.forEach((tag) => {
-              if (tagsStr === "") {
-                tagsStr = tag.name;
-              } else {
-                tagsStr = tagsStr + "," + tag.name;
-              }
-            });
-            return tagsStr;
-          },
+          cell(h, {  row: { tags } }) {
+             return tags.map(({ name }) => name).join(",");
+            },
         },
         {
-          width: 100,
+          width: 80,
           colKey: "commentsNum",
           title: "评论",
         },
         {
-          width: 100,
+          width: 90,
           colKey: "visits",
           title: "访问量",
         },
         {
-          width: 100,
           colKey: "publishTime",
           title: "发布时间",
-          render(h, { row: { publishTime } }) {
-            return timeAgo(publishTime);
-          },
+          cell(h, { row: { publishTime } }) {
+             return timeAgo(publishTime);
+            },
         },
         {
           fixed: "right",
-          width: 150,
           colKey: "op",
           title: "操作",
         },

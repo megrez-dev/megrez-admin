@@ -36,7 +36,7 @@ export default {
   },
   mounted() {
     this.contentEditor = new Vditor("vditor", {
-      height: 800,
+      height: 600,
       icon: "material",
       input: this.contentChange,
       counter: {

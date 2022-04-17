@@ -11,14 +11,14 @@ export const menuRoutes = [
         children: [
             {
                 path: '/overview',
-                component: () => import('@/views/article/ArticleList.vue'),
+                component: () => import('@/views/overview/Overview.vue'),
                 name: 'Overview',
                 meta: { title: '总览', icon: 'dashboard' }
             },
             {
-                path: '/static',
-                component: () => import('@/views/article/ArticleList.vue'),
-                name: 'Static',
+                path: '/statistic',
+                component: () => import('@/views/statistic/Statistic.vue'),
+                name: 'Statistic',
                 meta: { title: '统计', icon: 'chart' }
             },
             {
@@ -56,7 +56,7 @@ export const menuRoutes = [
             },
             {
                 path: '/comment',
-                component: () => import('@/views/article/ArticleList.vue'),
+                component: () => import('@/views/comment/Comment.vue'),
                 name: 'Comment',
                 meta: { title: '评论', icon: 'edit-1' }
             },

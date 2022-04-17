@@ -7,51 +7,27 @@
             <h2>添加友链</h2>
           </div>
           <div class="card-content">
-            <t-form
-              :data="formData"
-              ref="form"
-              @reset="onReset"
-              @submit="onSubmit"
-              labelAlign="top"
-              :colon="true"
-            >
-              <t-form-item label="姓名" name="name">
-                <t-input
-                  v-model="formData.name"
-                  placeholder="请输入内容"
-                ></t-input>
+            <t-form ref="form" labelAlign="top" :colon="true">
+              <t-form-item label="网站名称" name="name">
+                <t-input v-model="link.name"></t-input>
               </t-form-item>
-              <t-form-item label="手机号码" name="tel">
-                <t-input
-                  v-model="formData.tel"
-                  placeholder="请输入内容"
-                ></t-input>
+              <t-form-item label="网站地址" name="url">
+                <t-input v-model="link.url" placeholder="http://"></t-input>
               </t-form-item>
-              <t-form-item label="接收短信" name="status">
-                <t-switch v-model="formData.status"></t-switch>
+              <t-form-item label="Logo" name="logo">
+                <t-input v-model="link.logo"></t-input>
               </t-form-item>
-              <t-form-item label="性别" name="gender">
-                <t-radio-group v-model="formData.gender">
-                  <t-radio value="1">男</t-radio>
-                  <t-radio value="2">女</t-radio>
-                </t-radio-group>
+              <t-form-item label="排序" name="order">
+                <t-input-number
+                  v-model="link.order"
+                  theme="row"
+                ></t-input-number>
               </t-form-item>
-              <t-form-item label="课程" name="course">
-                <t-checkbox-group
-                  v-model="formData.course"
-                  :options="courseOptions"
-                ></t-checkbox-group>
-              </t-form-item>
-              <t-form-item>
-                <t-button
-                  theme="primary"
-                  type="submit"
-                  style="margin-right: 10px"
-                  >提交</t-button
-                >
-                <t-button theme="default" variant="base" type="reset"
-                  >重置</t-button
-                >
+              <t-form-item label="网站描述" name="description">
+                <t-textarea
+                  v-model="link.description"
+                  :autosize="{ minRows: 3 }"
+                />
               </t-form-item>
             </t-form>
           </div>
@@ -89,26 +65,17 @@
 </template>
 
 <script>
-const INITIAL_DATA = {
-  name: "",
-  tel: "",
-  gender: "",
-  course: [],
-  status: false,
-};
-
 export default {
-    name: 'Links',
+  name: "Links",
   data() {
     return {
-      formData: { ...INITIAL_DATA },
-      courseOptions: [
-        { label: "语文", value: "1" },
-        { label: "数学", value: "2" },
-        { label: "英语", value: "3" },
-      ],
-      // right
-      data: [],
+      link: {
+        name: "",
+        url: "",
+        logo: "",
+        order: 0,
+        description: "",
+      },
       isLoading: false,
       columns: [
         {
@@ -203,8 +170,11 @@ export default {
       await this.fetchData(pagination);
     },
     handleClickDetail() {
-        this.$notification.success({title:'标题', content:'这是一条成功内容'});
-    }
+      this.$notification.success({
+        title: "标题",
+        content: "这是一条成功内容",
+      });
+    },
   },
 };
 </script>

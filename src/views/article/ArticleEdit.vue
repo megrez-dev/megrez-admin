@@ -1,7 +1,10 @@
 <template>
   <div class="article-edit-container">
     <div class="article-edit-bar">
-      <span class="article-edit-bar-title">{{
+      <span class="article-edit-bar-title article-edit-bar-title-dark" v-if="dark">{{
+        article.title === "" ? "新文章" : article.title
+      }}</span>
+      <span class="article-edit-bar-title article-edit-bar-title-light" v-else>{{
         article.title === "" ? "新文章" : article.title
       }}</span>
       <span class="article-edit-bar-operator">
@@ -219,22 +222,13 @@
         </div>
       </t-tab-panel>
     </t-tabs>
-    <t-drawer
-      header="基本设置"
-      :visible="attachDrawerVisible"
-      size="480px"
-      @cancel="attachDrawerVisible = false"
-      :onOverlayClick="() => (attachDrawerVisible = false)"
-      :onConfirm="() => (attachDrawerVisible = false)"
-      placement="right"
-    >
-      <p>抽屉的内容</p>
-    </t-drawer>
+    <AttachListDrawer></AttachListDrawer>
   </div>
 </template>
 
 <script>
 import Vditor from "@/components/vditor/Vditor.vue";
+import AttachListDrawer from "@/components/attachment/AttachListDrawer.vue";
 import { Icon, AddIcon } from "tdesign-icons-vue";
 
 export default {
@@ -260,7 +254,7 @@ export default {
   },
   data() {
     return {
-      attachDrawerVisible: false,
+      dark: false,
       // 0 for create, 1 for edit
       state: 0,
       article: {
@@ -337,7 +331,7 @@ export default {
       }
     },
     openDrawer() {
-      this.attachDrawerVisible = true;
+      this.$store.commit("OPEN_ATTACH_LIST_DRAWER");
     },
     handleUpdate() {
       //validate
@@ -461,7 +455,7 @@ export default {
       });
     },
   },
-  components: { Vditor, Icon, AddIcon },
+  components: { Vditor, AttachListDrawer, Icon, AddIcon },
   mounted() {
     // list categories
     this.$request.get("categories").then((res) => {
@@ -483,6 +477,20 @@ export default {
       });
     });
   },
+  watch: {
+    // 监听 store里面的数据
+    "$store.state.app.isDark": {
+      deep: true,
+      handler: function (newValue) {
+        // result为true，则表示是全部选中
+        if (newValue) {
+          this.dark = true;
+        } else {
+          this.dark = false;
+        }
+      },
+    },
+  },
 };
 </script>
 
@@ -500,6 +508,12 @@ export default {
       font-weight: 1000;
       text-align: center;
       // color: @brand-color-1;
+    }
+    .article-edit-bar-title-dark {
+      color: white;
+    }
+    .article-edit-bar-title-light {
+      color: black;
     }
     .article-edit-bar-operator {
       float: right;
