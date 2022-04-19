@@ -81,13 +81,13 @@ export default {
 .login-card-container {
   box-shadow: -4px 7px 46px 2px rgb(0 0 0 / 10%);
   width: 320px;
-  padding: 24px 32px;
+  padding: 16px 24px;
   position: absolute;
   margin: -160px 0 0 -160px;
   top: 45%;
   left: 50%;
   background-color: @bg-color-container;
-  border-radius: 5px;
+  border-radius: 2px;
   display: flex;
   flex-direction: column;
 }

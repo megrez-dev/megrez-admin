@@ -80,9 +80,9 @@ export default {
 .article-list-container {
   margin-top: 10px;
   .card-container {
-    padding: 24px 32px;
+    padding: 16px 24px;
     background-color: @bg-color-container;
-    border-radius: 5px;
+    border-radius: 2px;
     width: 100%;
     display: flex;
     flex-direction: column;

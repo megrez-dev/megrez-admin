@@ -12,12 +12,42 @@
       <t-table
         :data="articleList"
         :columns="columns"
-        :rowKey="rowKey"
-        :verticalAlign="verticalAlign"
+        rowKey="property"
+        verticalAlign="middle"
         :loading="isArticleListLoading"
         :pagination="pagination"
         @change="rehandleChange"
       >
+        <template #categories="{ row }">
+          <t-tag
+            v-for="(category, index) in row.categories"
+            :key="index"
+            size="small"
+            theme="primary"
+            variant="light"
+            style="margin-bottom: 8px; margin-right: 8px"
+          >
+            {{ category.name }}
+          </t-tag>
+        </template>
+        <template #tags="{ row }">
+          <t-tag
+            v-for="(tag, index) in row.tags"
+            :key="index"
+            size="small"
+            theme="success"
+            variant="light"
+            style="margin-bottom: 8px; margin-right: 8px"
+          >
+            {{ tag.name }}
+          </t-tag>
+        </template>
+        <template #commentsNum="{ row }">
+          <t-badge :count="row.commentsNum" shape="round" :offset="[-14, -4]" showZero> </t-badge>
+        </template>
+        <template #visits="{ row }">
+          <t-badge :count="row.visits" shape="round" color="#fcc524" :offset="[-20, -4]" showZero> </t-badge>
+        </template>
         <template #op="slotProps">
           <a class="t-button-link" @click="handleClickDetail(slotProps)"
             >编辑</a
@@ -52,7 +82,6 @@ export default {
           },
         },
         {
-          // width: 100,
           colKey: "status",
           title: "状态",
           cell(h, { row: { status } }) {
@@ -64,22 +93,15 @@ export default {
             }
             return "未知";
           },
+          width: "100px",
         },
         {
-          // width: 200,
           colKey: "categories",
           title: "分类",
-          cell(h, {  row: { categories } }) {
-            return categories.map(({ name }) => name).join(",");
-          },
         },
         {
-          // width: 200,
           colKey: "tags",
           title: "标签",
-          cell(h, {  row: { tags } }) {
-             return tags.map(({ name }) => name).join(",");
-            },
         },
         {
           width: 80,
@@ -95,8 +117,8 @@ export default {
           colKey: "publishTime",
           title: "发布时间",
           cell(h, { row: { publishTime } }) {
-             return timeAgo(publishTime);
-            },
+            return timeAgo(publishTime);
+          },
         },
         {
           fixed: "right",
@@ -104,10 +126,6 @@ export default {
           title: "操作",
         },
       ],
-      rowKey: "property",
-      tableLayout: "auto",
-      verticalAlign: "top",
-      rowClassName: "property-class",
       pagination: {
         current: 1,
         pageSize: 10,
@@ -124,22 +142,20 @@ export default {
       this.$request
         .get("articles?pageNum=" + current + "&pageSize=" + pageSize)
         .then((res) => {
-          console.log(res.data);
           this.articleList = res.data.list;
           this.pagination = {
             ...pagination,
             total: res.data.total,
           };
         })
-        .catch((err) => {
-          console.log(err);
+        .catch(() => {
+          this.$message.error("获取文章列表失败");
         })
         .finally(() => {
           this.isArticleListLoading = false;
         });
     },
     rehandleChange(pageInfo) {
-      console.log("pageInfo", pageInfo);
       this.pagination.current = pageInfo.pagination.current;
       this.pagination.pageSize = pageInfo.pagination.pageSize;
       this.listArticles(this.pagination);
@@ -148,21 +164,19 @@ export default {
       this.$router.push({ name: "ArticleEdit" });
     },
     handleClickDetail(slotProps) {
-      console.log("slogProps", slotProps);
       this.$router.push({
         name: "ArticleEdit",
         query: { articleID: slotProps.row.id },
       });
-      console.log("编辑");
     },
     handleClickDelete(slotProps) {
       this.$request
         .delete("article/" + slotProps.row.id)
         .then((res) => {
           if (res.status === 0) {
-            for(var i=0;i<this.articleList.length;i++){
-              if(this.articleList[i].id === slotProps.row.id){
-                this.articleList.splice(i,1);
+            for (var i = 0; i < this.articleList.length; i++) {
+              if (this.articleList[i].id === slotProps.row.id) {
+                this.articleList.splice(i, 1);
                 break;
               }
             }
@@ -184,9 +198,9 @@ export default {
 .article-list-container {
   margin-top: 10px;
   .card-container {
-    padding: 24px 32px;
+    padding: 16px 24px;
     background-color: @bg-color-container;
-    border-radius: 5px;
+    border-radius: 2px;
     width: 100%;
     display: flex;
     flex-direction: column;

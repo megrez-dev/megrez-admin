@@ -28,16 +28,16 @@ export default {
     padding: 0 0 24px 0;
     margin-right: 10px;
     background-color: @bg-color-container;
-    border-radius: 5px;
+    border-radius: 2px;
     width: 100%;
     display: flex;
     flex-direction: column;
     .card-title {
-      padding: 0 32px;
+      padding: 0 24px;
       border-bottom: 1px solid @border-level-1-color;
     }
     .card-content {
-      padding: 24px 32px 0;
+      padding: 16px 24px 0;
       height: 400px;
     }
   }

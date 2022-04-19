@@ -115,7 +115,7 @@ export default {
     height: 175px;
     align-items: center;
     margin: 0 auto;
-    border-radius: 5px;
+    border-radius: 2px;
   }
 }
 </style>

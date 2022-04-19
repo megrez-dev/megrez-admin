@@ -1,7 +1,7 @@
 <template>
   <div class="links-container">
     <t-row>
-      <t-col :flex="'39%'">
+      <t-col :flex="'34%'">
         <div class="card-container">
           <div class="card-title">
             <h2>添加友链</h2>
@@ -17,9 +17,9 @@
               <t-form-item label="Logo" name="logo">
                 <t-input v-model="link.logo"></t-input>
               </t-form-item>
-              <t-form-item label="排序" name="order">
+              <t-form-item label="排序" name="priority">
                 <t-input-number
-                  v-model="link.order"
+                  v-model="link.priority"
                   theme="row"
                 ></t-input-number>
               </t-form-item>
@@ -31,29 +31,77 @@
               </t-form-item>
             </t-form>
           </div>
+          <div class="card-footer">
+            <t-button
+              theme="primary"
+              @click="handleClickAdd"
+              v-if="mode === 'add'"
+            >
+              添加
+            </t-button>
+            <t-button
+              theme="primary"
+              @click="handleClickUpdate"
+              v-if="mode === 'edit'"
+            >
+              更新
+            </t-button>
+            <t-button
+              theme="primary"
+              variant="dashed"
+              @click="handleClickReturn"
+              v-if="mode === 'edit'"
+            >
+              返回添加
+            </t-button>
+          </div>
         </div>
       </t-col>
       <t-col :flex="'1%'"> </t-col>
-      <t-col :flex="'60%'">
+      <t-col :flex="'65%'">
         <div class="card-container">
           <div class="card-title">
             <h2>所有友链</h2>
           </div>
           <div class="card-content">
             <t-table
-              :data="data"
+              :data="links"
               :columns="columns"
-              :rowKey="rowKey"
-              :verticalAlign="verticalAlign"
+              rowKey="property"
+              verticalAlign="middle"
               :loading="isLoading"
               :pagination="pagination"
               @change="rehandleChange"
             >
+              <template #url="{ row }">
+                <a
+                  :href="row.url"
+                  target="_blank"
+                  style="text-overflow: ellipsis"
+                  >{{ row.url }}</a
+                >
+              </template>
+              <template #logo="{ row }">
+                <div class="logo-wrapper">
+                  <img :src="row.logo" :alt="row.name" />
+                </div>
+              </template>
+              <template #priority="{ row }">
+                <t-badge
+                  :count="row.priority"
+                  shape="round"
+                  :offset="[-14, -4]"
+                  showZero
+                >
+                </t-badge>
+              </template>
               <template #op="slotProps">
-                <a class="t-button-link" @click="handleClickDetail()">编辑</a>
+                <a class="t-button-link" @click="handleClickEdit(slotProps)"
+                  >编辑</a
+                >
                 <t-divider layout="vertical" />
-                <a class="t-button-link" @click="handleClickRecyle(slotProps)"
-                  >回收站</a
+                <a class="t-button-link" @click="handleClickDelete(slotProps)"
+                  >删除</a
                 >
               </template>
             </t-table>
@@ -69,55 +117,47 @@ export default {
   name: "Links",
   data() {
     return {
+      mode: "add",
       link: {
         name: "",
         url: "",
         logo: "",
-        order: 0,
+        priority: 0,
         description: "",
       },
+      links: [],
       isLoading: false,
       columns: [
         {
-          width: 200,
           colKey: "name",
-          title: "姓名",
-          render(h, { row: { name } }) {
-            return name ? `${name.first} ${name.last}` : "UNKNOW_USER";
-          },
+          title: "名称",
+          width: "150px",
         },
         {
-          width: 200,
-          colKey: "gender",
-          title: "性别",
+          colKey: "url",
+          title: "URL",
         },
         {
-          width: 200,
-          colKey: "phone",
-          title: "联系方式",
-          render(h, { row: { phone } }) {
-            return phone;
-          },
+          colKey: "logo",
+          title: "LOGO",
+          width: "100px",
         },
         {
-          width: 260,
-          colKey: "email",
-          title: "邮箱",
+          colKey: "priority",
+          title: "排序",
+          width: "100px",
         },
         {
           fixed: "right",
-          width: 200,
           colKey: "op",
           title: "操作",
         },
       ],
-      rowKey: "property",
       tableLayout: "auto",
-      verticalAlign: "top",
       rowClassName: "property-class",
       pagination: {
         current: 1,
-        pageSize: 10,
+        pageSize: 5,
       },
     };
   },
@@ -126,54 +166,90 @@ export default {
   },
 
   methods: {
-    onReset() {
-      this.$message.success("重置成功");
-    },
-    onSubmit({ validateResult, firstError }) {
-      if (validateResult === true) {
-        this.$message.success("提交成功");
-      } else {
-        console.log("Errors: ", validateResult);
-        this.$message.warning(firstError);
-      }
+    handleClickAdd() {
+      this.$request
+        .post("link", this.link)
+        .then((res) => {
+          this.$message.success("添加成功");
+          this.links.push(res.data);
+          this.clearForm();
+        })
+        .catch(() => {
+          this.$message.warning("添加失败");
+        });
     },
     async fetchData(pagination = this.pagination) {
       try {
         this.isLoading = true;
-        const { current, pageSize } = pagination;
-        // 请求可能存在跨域问题
-        const url = new URL("https://randomuser.me/api");
-        const params = { page: current, results: pageSize };
-        Object.keys(params).forEach((key) =>
-          url.searchParams.append(key, params[key])
-        );
-        const response = await fetch(url).then((x) => x.json());
-        this.data = response.results;
-        this.pagination = {
-          ...pagination,
-          total: 120,
-        };
+        this.$request
+          .get("links", {
+            params: {
+              pageNum: pagination.current,
+              pageSize: pagination.pageSize,
+            },
+          })
+          .then((res) => {
+            this.links = res.data.list;
+            this.pagination = {
+              ...pagination,
+              total: res.data.total,
+            };
+          });
       } catch (err) {
-        this.data = [];
+        this.links = [];
       }
       this.isLoading = false;
     },
     // 也可以使用 page-change 事件
-    async rehandleChange(changeParams, triggerAndData) {
-      console.log(
-        "分页、排序、过滤等发生变化时会触发 change 事件：",
-        changeParams,
-        triggerAndData
-      );
+    async rehandleChange(changeParams) {
       const { current, pageSize } = changeParams.pagination;
       const pagination = { current, pageSize };
       await this.fetchData(pagination);
     },
-    handleClickDetail() {
-      this.$notification.success({
-        title: "标题",
-        content: "这是一条成功内容",
-      });
+    handleClickEdit({ row }) {
+      this.mode = "edit";
+      this.link = { ...row };
+    },
+    handleClickDelete({ row }) {
+      this.$request
+        .delete("link/" + row.id)
+        .then(() => {
+          this.$message.info("删除成功");
+          for (let i = 0; i < this.links.length; i++) {
+            if (this.links[i].id === row.id) {
+              this.links.splice(i, 1);
+              break;
+            }
+          }
+        })
+        .catch(() => {
+          this.$message.error("删除失败");
+        });
+    },
+    handleClickUpdate() {
+      this.$request
+        .put("link/" + this.link.id, this.link)
+        .then(() => {
+          this.$message.info("更新成功");
+          this.mode = "add";
+          this.clearForm();
+          this.fetchData();
+        })
+        .catch(() => {
+          this.$message.error("更新失败");
+        });
+    },
+    handleClickReturn() {
+      this.mode = "add";
+      this.clearForm();
+    },
+    clearForm() {
+      this.link.id = 0;
+      this.link.name = "";
+      this.link.url = "";
+      this.link.logo = "";
+      this.link.priority = 0;
+      this.link.description = "";
     },
   },
 };
@@ -184,19 +260,22 @@ export default {
 .links-container {
   margin-top: 10px;
   .card-container {
-    padding: 0 0 24px 0;
+    padding: 0 0 16px 0;
     margin-right: 10px;
     background-color: @bg-color-container;
-    border-radius: 5px;
+    border-radius: 2px;
     width: 100%;
     display: flex;
     flex-direction: column;
     .card-title {
-      padding: 0 32px;
+      padding: 0 24px;
       border-bottom: 1px solid @border-level-1-color;
     }
     .card-content {
-      padding: 24px 32px 0;
+      padding: 16px 24px 0;
+    }
+    .card-footer {
+      padding: 16px 24px 0;
     }
   }
 }
@@ -206,5 +285,18 @@ export default {
   text-decoration: none;
   cursor: pointer;
   transition: color 0.2s cubic-bezier(0.38, 0, 0.24, 1);
+}
+
+.logo-wrapper {
+  width: 40px;
+  height: 40px;
+  background: #eeeeee;
+  border-radius: 2px;
+  img {
+    margin: auto;
+    width: 100%;
+    height: 100%;
+    border-radius: 2px;
+  }
 }
 </style>

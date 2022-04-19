@@ -181,13 +181,13 @@ export default {
 .install-card-container {
   box-shadow: rgb(99 99 99 / 20%) 0px 2px 8px 0px;
   width: 500px;
-  padding: 24px 32px;
+  padding: 16px 24px;
   position: absolute;
   top: 40%;
   left: 50%;
   margin: -250px 0 0 -250px;
   background-color: @bg-color-container;
-  border-radius: 5px;
+  border-radius: 2px;
   display: flex;
   flex-direction: column;
 }
