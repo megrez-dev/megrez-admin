@@ -7,7 +7,11 @@
       </div>
     </template>
     <div class="menu-root-item" v-for="rootItem in menu" :key="rootItem.name">
-      <t-menu-item :value="rootItem.name" :to="{name: rootItem.name}" v-if="!rootItem.children">
+      <t-menu-item
+        :value="rootItem.name"
+        :to="{ name: rootItem.name }"
+        v-if="!rootItem.children"
+      >
         <template #icon>
           <icon :name="rootItem.meta.icon" />
         </template>
@@ -23,7 +27,7 @@
           v-for="subItem in rootItem.children"
           :key="subItem.name"
         >
-          <t-menu-item :value="subItem.path" :to="{name: subItem.name}">
+          <t-menu-item :value="subItem.path" :to="{ name: subItem.name }">
             <template #icon>
               <icon :name="subItem.meta.icon" />
             </template>
@@ -53,7 +57,7 @@ export default {
       }
     },
     menu() {
-      return menuRoutes.find(item => item.path === '/').children;
+      return menuRoutes.find((item) => item.path === "/").children;
     },
   },
 };
@@ -63,6 +67,7 @@ aside {
   position: fixed;
   top: 0;
   z-index: 1;
+  box-shadow: 2px 0 8px 0 rgb(29 35 41 / 5%);
 }
 .aside-title-container {
   text-align: center;

@@ -1,118 +1,114 @@
 <template>
-  <div class="links-container">
-    <t-row>
-      <t-col :flex="'34%'">
-        <div class="card-container">
-          <div class="card-title">
-            <h2>添加友链</h2>
-          </div>
-          <div class="card-content">
-            <t-form ref="form" labelAlign="top" :colon="true">
-              <t-form-item label="网站名称" name="name">
-                <t-input v-model="link.name"></t-input>
-              </t-form-item>
-              <t-form-item label="网站地址" name="url">
-                <t-input v-model="link.url" placeholder="http://"></t-input>
-              </t-form-item>
-              <t-form-item label="Logo" name="logo">
-                <t-input v-model="link.logo"></t-input>
-              </t-form-item>
-              <t-form-item label="排序" name="priority">
-                <t-input-number
-                  v-model="link.priority"
-                  theme="row"
-                ></t-input-number>
-              </t-form-item>
-              <t-form-item label="网站描述" name="description">
-                <t-textarea
-                  v-model="link.description"
-                  :autosize="{ minRows: 3 }"
-                />
-              </t-form-item>
-            </t-form>
-          </div>
-          <div class="card-footer">
-            <t-button
-              theme="primary"
-              @click="handleClickAdd"
-              v-if="mode === 'add'"
-            >
-              添加
-            </t-button>
-            <t-button
-              theme="primary"
-              @click="handleClickUpdate"
-              v-if="mode === 'edit'"
-            >
-              更新
-            </t-button>
-            <t-button
-              theme="primary"
-              variant="dashed"
-              @click="handleClickReturn"
-              v-if="mode === 'edit'"
-            >
-              返回添加
-            </t-button>
-          </div>
-        </div>
-      </t-col>
-      <t-col :flex="'1%'"> </t-col>
-      <t-col :flex="'65%'">
-        <div class="card-container">
-          <div class="card-title">
-            <h2>所有友链</h2>
-          </div>
-          <div class="card-content">
-            <t-table
-              :data="links"
-              :columns="columns"
-              rowKey="property"
-              verticalAlign="middle"
-              :loading="isLoading"
-              :pagination="pagination"
-              @change="rehandleChange"
-            >
-              <template #url="{ row }">
-                <a
-                  :href="row.url"
-                  target="_blank"
-                  style="text-overflow: ellipsis"
-                  >{{ row.url }}</a
+  <PageView>
+    <template slot="content">
+      <div class="links-container">
+        <t-row>
+          <t-col :flex="'34%'">
+            <t-card title="添加友链" :bordered="false" header-bordered>
+              <t-form ref="form" labelAlign="top" :colon="true">
+                <t-form-item label="网站名称" name="name">
+                  <t-input v-model="link.name"></t-input>
+                </t-form-item>
+                <t-form-item label="网站地址" name="url">
+                  <t-input v-model="link.url" placeholder="http://"></t-input>
+                </t-form-item>
+                <t-form-item label="Logo" name="logo">
+                  <t-input v-model="link.logo"></t-input>
+                </t-form-item>
+                <t-form-item label="排序" name="priority">
+                  <t-input-number
+                    v-model="link.priority"
+                    theme="row"
+                  ></t-input-number>
+                </t-form-item>
+                <t-form-item label="网站描述" name="description">
+                  <t-textarea
+                    v-model="link.description"
+                    :autosize="{ minRows: 3 }"
+                  />
+                </t-form-item>
+              </t-form>
+              <template slot="footer">
+                <t-button
+                  theme="primary"
+                  @click="handleClickAdd"
+                  v-if="mode === 'add'"
                 >
-              </template>
-              <template #logo="{ row }">
-                <div class="logo-wrapper">
-                  <img :src="row.logo" :alt="row.name" />
-                </div>
-              </template>
-              <template #priority="{ row }">
-                <t-badge
-                  :count="row.priority"
-                  shape="round"
-                  :offset="[-14, -4]"
-                  showZero
+                  添加
+                </t-button>
+                <t-button
+                  theme="primary"
+                  @click="handleClickUpdate"
+                  v-if="mode === 'edit'"
                 >
-                </t-badge>
-              </template>
-              <template #op="slotProps">
-                <a class="t-button-link" @click="handleClickEdit(slotProps)"
-                  >编辑</a
+                  更新
+                </t-button>
+                <t-button
+                  theme="primary"
+                  variant="dashed"
+                  @click="handleClickReturn"
+                  v-if="mode === 'edit'"
                 >
-                <t-divider layout="vertical" />
-                <a class="t-button-link" @click="handleClickDelete(slotProps)"
-                  >删除</a
-                >
+                  返回添加
+                </t-button>
               </template>
-            </t-table>
-          </div>
-        </div>
-      </t-col>
-    </t-row>
-  </div>
+            </t-card>
+          </t-col>
+          <t-col :flex="'1%'"> </t-col>
+          <t-col :flex="'65%'">
+            <t-card title="友链列表" :bordered="false" header-bordered>
+              <t-table
+                :data="links"
+                :columns="columns"
+                rowKey="property"
+                verticalAlign="middle"
+                :loading="isLoading"
+                :pagination="pagination"
+                @change="rehandleChange"
+              >
+                <template #url="{ row }">
+                  <a
+                    class="t-button-link"
+                    :href="row.url"
+                    target="_blank"
+                    style="text-overflow: ellipsis"
+                    >{{ row.url }}</a
+                  >
+                </template>
+                <template #logo="{ row }">
+                  <div class="logo-wrapper">
+                    <img :src="row.logo" :alt="row.name" />
+                  </div>
+                </template>
+                <template #priority="{ row }">
+                  <t-badge
+                    :count="row.priority"
+                    shape="round"
+                    :offset="[-14, -5]"
+                    showZero
+                  >
+                  </t-badge>
+                </template>
+                <template #op="slotProps">
+                  <a class="t-button-link" @click="handleClickEdit(slotProps)"
+                    >编辑</a
+                  >
+                  <t-divider layout="vertical" />
+                  <a class="t-button-link" @click="handleClickDelete(slotProps)"
+                    >删除</a
+                  >
+                </template>
+              </t-table>
+            </t-card>
+          </t-col>
+        </t-row>
+      </div>
+    </template>
+  </PageView>
 </template>
 
 <script>
+import PageView from "@/layouts/PageView";
 export default {
   name: "Links",
   data() {
@@ -252,41 +248,15 @@ export default {
       this.link.description = "";
     },
   },
+  components: {
+    PageView,
+  },
 };
 </script>
 
 <style lang="less" scoped>
 @import "@/style/variables";
-.links-container {
-  margin-top: 10px;
-  .card-container {
-    padding: 0 0 16px 0;
-    margin-right: 10px;
-    background-color: @bg-color-container;
-    border-radius: 2px;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    .card-title {
-      padding: 0 24px;
-      border-bottom: 1px solid @border-level-1-color;
-    }
-    .card-content {
-      padding: 16px 24px 0;
-    }
-    .card-footer {
-      padding: 16px 24px 0;
-    }
-  }
-}
-
-.t-button-link {
-  color: @brand-color;
-  text-decoration: none;
-  cursor: pointer;
-  transition: color 0.2s cubic-bezier(0.38, 0, 0.24, 1);
-}
-
+@import "@/style/index";
 .logo-wrapper {
   width: 40px;
   height: 40px;

@@ -4,9 +4,9 @@ import BlankLayout from '@/layouts/BlankLayout'
 export const menuRoutes = [
     {
         path: '/',
-        name: 'index',
+        name: 'Index',
         component: BasicLayout,
-        meta: { title: '首页' },
+        meta: { title: '首页', icon: 'home' },
         redirect: '/overview',
         children: [
             {
@@ -59,6 +59,33 @@ export const menuRoutes = [
                 component: () => import('@/views/comment/Comment.vue'),
                 name: 'Comment',
                 meta: { title: '评论', icon: 'edit-1' }
+            },
+            {
+                path: '/appearance',
+                component: BlankLayout,
+                redirect: '/appearance/theme',
+                name: 'Appearance',
+                meta: { title: '外观', icon: 'view-module' },
+                children: [
+                    {
+                        path: 'theme',
+                        component: () => import('@/views/appearance/Theme.vue'),
+                        name: 'Theme',
+                        meta: { title: '主题', icon: 'view-module' },
+                    },
+                    {
+                        path: 'setting',
+                        component: () => import('@/views/appearance/ThemeSetting.vue'),
+                        name: 'ThemeSetting',
+                        meta: { title: '主题设置', icon: 'edit-1' },
+                    },
+                    {
+                        path: 'edit',
+                        component: () => import('@/views/appearance/ThemeEdit.vue'),
+                        name: 'ThemeEdit',
+                        meta: { title: '主题编辑', icon: 'edit-1' },
+                    },
+                ],
             },
         ]
     },

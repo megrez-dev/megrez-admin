@@ -1,21 +1,29 @@
 <template>
-  <div class="links-container">
-    <div class="card-container">
-      <div class="card-title">
-        <h2>主题编辑</h2>
+  <PageView>
+    <template slot="content">
+      <div class="links-container">
+        <div class="card-container">
+          <div class="card-title">
+            <h2>主题编辑</h2>
+          </div>
+          <div class="card-content">
+            <h3>未实现</h3>
+          </div>
+        </div>
       </div>
-      <div class="card-content">
-          <h3>未实现</h3>
-      </div>
-    </div>
-  </div>
+    </template>
+  </PageView>
 </template>
 
 <script>
+import PageView from "@/layouts/PageView";
 export default {
   name: "ThemeEdit",
   data() {
     return {};
+  },
+  components: {
+    PageView,
   },
 };
 </script>
@@ -23,7 +31,6 @@ export default {
 <style lang="less" scoped>
 @import "@/style/variables";
 .links-container {
-  margin-top: 10px;
   .card-container {
     padding: 0 0 24px 0;
     margin-right: 10px;
@@ -41,12 +48,5 @@ export default {
       height: 400px;
     }
   }
-}
-
-.t-button-link {
-  color: @brand-color;
-  text-decoration: none;
-  cursor: pointer;
-  transition: color 0.2s cubic-bezier(0.38, 0, 0.24, 1);
 }
 </style>

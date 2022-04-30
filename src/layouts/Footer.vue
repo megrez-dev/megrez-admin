@@ -2,7 +2,7 @@
   <div :class="prefix + '-footer'">Copyright @ 2021-{{ new Date().getFullYear() }} Megrez | Designed by AlkaidChen</div>
 </template>
 
-<script lang="ts">
+<script>
 import Vue from 'vue';
 
 export default Vue.extend({

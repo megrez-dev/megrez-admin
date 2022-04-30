@@ -1,13 +1,8 @@
 <template>
   <t-layout class="megrez-layout">
-    <t-content class="megrez-content-layout">
-      <BreadCrumb></BreadCrumb>
-      <transition name="fade" mode="out-in">
-        <div class="page-component-wrapper">
-          <router-view />
-        </div>
-      </transition>
-    </t-content>
+    <transition name="fade" mode="out-in">
+      <router-view />
+    </transition>
     <t-footer class="megrez-footer-layout">
       <Footer></Footer>
     </t-footer>
@@ -15,11 +10,10 @@
 </template>
 
 <script>
-import BreadCrumb from "@/layouts/BreadCrumb.vue";
 import Footer from "@/layouts/Footer.vue";
 export default {
   name: "Content",
-  components: { BreadCrumb,Footer },
+  components: { Footer },
 };
 </script>
 
