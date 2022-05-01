@@ -1,5 +1,20 @@
 <template>
   <PageView>
+    <template slot="header">
+      <div class="page-header-bar">
+        <div class="page-header-bar-text">
+          <span class="page-header-bar-title">当前主题</span>
+          <span class="page-header-bar-description">{{ currentTheme }}</span>
+        </div>
+        <span class="page-header-bar-operator">
+          <span class="page-header-bar-operator-item">
+            <t-button theme="primary" variant="base" @click="onClickSave"
+              >保存设置</t-button
+            >
+          </span>
+        </span>
+      </div>
+    </template>
     <template slot="content">
       <div class="theme-setting-container">
         <t-tabs
@@ -97,28 +112,47 @@ export default {
       themeConfig: {
         tabs: [],
       },
+      currentTheme: "",
     };
   },
   methods: {
     openAttachDrawer() {
       this.$store.commit("OPEN_ATTACH_LIST_DRAWER");
     },
-  },
-  beforeMount() {
-    this.$request.get("/theme/config").then((res) => {
-      this.themeConfig = res.data;
-      for (let i = 0; i < this.themeConfig.tabs.length; i++) {
-        for (let j = 0; j < this.themeConfig.tabs[i].items.length; j++) {
-          if (
-            this.themeConfig.tabs[i].items[j].type === "multiSelect" ||
-            this.themeConfig.tabs[i].items[j].type === "tags"
-          ) {
-            this.themeConfig.tabs[i].items[j].value = [];
+    onClickSave() {
+      this.$request
+        .put("/theme/current/config", this.themeConfig)
+        .then(() => {
+          this.$message.success("保存成功");
+        })
+        .catch(() => {
+          this.$message.error("保存失败");
+        });
+    },
+    fetchConfig() {
+      this.$request.get("/theme/current/config").then((res) => {
+        for (let i = 0; i < this.themeConfig.tabs.length; i++) {
+          for (let j = 0; j < this.themeConfig.tabs[i].items.length; j++) {
+            if (
+              this.themeConfig.tabs[i].items[j].type === "multiSelect" ||
+              this.themeConfig.tabs[i].items[j].type === "tags"
+            ) {
+              this.themeConfig.tabs[i].items[j].value = [];
+            }
           }
         }
-      }
-      console.log(this.themeConfig);
-    });
+        this.themeConfig = res.data;
+      });
+    },
+    fetchTheme() {
+      this.$request.get("/theme/current/id").then((res) => {
+        this.currentTheme = res.data;
+      });
+    },
+  },
+  beforeMount() {
+    this.fetchConfig();
+    this.fetchTheme();
   },
   components: {
     Icon,
@@ -130,6 +164,38 @@ export default {
 </script>
 
 <style lang="less" scoped>
+@import "@/style/variables";
+.page-header-bar {
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  .page-header-bar-text {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    .page-header-bar-title {
+      font-size: 20px;
+      font-weight: bold;
+      text-align: center;
+      align-items: center;
+      color: @text-color-primary;
+    }
+    .page-header-bar-description {
+      margin-left: 10px;
+      font-size: 16px;
+      font-weight: normal;
+      text-align: center;
+      align-items: center;
+      color: @text-color-secondary;
+    }
+  }
+  .page-header-bar-operator {
+    float: right;
+    .page-header-bar-operator-item {
+      margin-left: 15px;
+    }
+  }
+}
 .theme-setting-container {
   .setting-form-container {
     padding: 30px 30px;
