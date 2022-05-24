@@ -195,7 +195,7 @@
             </div>
           </t-tab-panel>
         </t-tabs>
-        <AttachListDrawer></AttachListDrawer>
+        <AttachListDrawer ref="attachListDrawer"></AttachListDrawer>
       </div>
     </template>
     <template slot="header">
@@ -237,7 +237,7 @@
 </template>
 
 <script>
-import Vditor from "@/components/vditor/Vditor.vue";
+import Vditor from "@/views/article/components/Vditor.vue";
 import AttachListDrawer from "@/components/attachment/AttachListDrawer.vue";
 import PageView from "@/layouts/PageView";
 import { Icon, AddIcon } from "tdesign-icons-vue";
@@ -341,7 +341,7 @@ export default {
       }
     },
     openDrawer() {
-      this.$store.commit("OPEN_ATTACH_LIST_DRAWER");
+      this.$refs.attachListDrawer.open();
     },
     handleUpdate() {
       //validate

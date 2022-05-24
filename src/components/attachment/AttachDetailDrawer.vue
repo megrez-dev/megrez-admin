@@ -34,14 +34,18 @@
           <t-list-item-meta title="图片链接"></t-list-item-meta>
           {{ attachment.url }}
           <template #action>
-            <t-button variant="text" shape="square" @click="copyURL"><file-copy-icon /></t-button>
+            <t-button variant="text" shape="square" @click="copyURL"
+              ><file-copy-icon
+            /></t-button>
           </template>
         </t-list-item>
         <t-list-item>
           <t-list-item-meta title="Markdown 链接"></t-list-item-meta>
           ![{{ attachment.fileName }}]({{ attachment.url }})
           <template #action>
-            <t-button variant="text" shape="square" @click="copyMarkdown"><file-copy-icon /></t-button>
+            <t-button variant="text" shape="square" @click="copyMarkdown"
+              ><file-copy-icon
+            /></t-button>
           </template>
         </t-list-item>
       </t-list>
@@ -57,7 +61,9 @@ import { FileCopyIcon } from "tdesign-icons-vue";
 export default {
   name: "AttachDetailDrawer",
   data() {
-    return {};
+    return {
+      visible: false,
+    };
   },
   props: {
     attachment: {
@@ -73,13 +79,13 @@ export default {
           return "未知";
       }
     },
-    visible() {
-      return this.$store.state.app.attachDetailDrawerVisible;
-    },
   },
   methods: {
+    open() {
+      this.visible = true;
+    },
     close() {
-      this.$store.commit("CLOSE_ATTACH_DETAIL_DRAWER");
+      this.visible = false;
     },
     deleteAttach() {
       this.$message.info("未实现");

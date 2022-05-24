@@ -10,62 +10,72 @@
         </div>
         <span class="page-header-bar-operator">
           <span class="page-header-bar-operator-item">
-            <t-button theme="primary" variant="base">安装</t-button>
+            <t-button theme="primary" variant="base" @click="onClickInstall"
+              >安装</t-button
+            >
           </span>
         </span>
       </div>
     </template>
     <template slot="content">
-      <t-card
-        :title="theme.name"
-        :cover="theme.cover"
-        :style="{ width: '400px' }"
-        v-for="theme in themes"
-        :key="theme.id"
-      >
-        <template #footer>
-          <t-row :align="'middle'" justify="center">
-            <t-col flex="auto">
-              <t-button block variant="text" v-if="theme.isCurrent" disabled>
-                <lock-on-icon slot="icon" style="color: blue" />已启用
-              </t-button>
-              <t-button block variant="text" v-else @click="onClickApply">
-                <lock-off-icon slot="icon" />未启用
-              </t-button>
-            </t-col>
-            <t-col flex="none">
-              <t-divider layout="vertical" />
-            </t-col>
-            <t-col flex="auto">
-              <t-button
-                block
-                variant="text"
-                v-if="theme.isCurrent"
-                @click="onClickSetting"
-              >
-                <setting-icon slot="icon" />设置
-              </t-button>
-              <t-button block variant="text" disabled v-else>
-                <setting-icon slot="icon" />设置
-              </t-button>
-            </t-col>
-            <t-col flex="none">
-              <t-divider layout="vertical" />
-            </t-col>
-            <t-col flex="auto">
-              <t-button block variant="text" @click="onClickDelete">
-                <delete-icon slot="icon" />删除
-              </t-button>
-            </t-col>
-          </t-row>
-        </template>
-      </t-card>
+      <div class="themes-container">
+        <div class="card-container" v-for="theme in themes" :key="theme.id">
+          <t-card :title="theme.name" :cover="theme.cover">
+            <template #footer>
+              <t-row :align="'middle'" justify="center">
+                <t-col flex="auto">
+                  <t-button
+                    block
+                    variant="text"
+                    v-if="theme.isCurrent"
+                    disabled
+                  >
+                    <lock-on-icon slot="icon" style="color: blue" />已启用
+                  </t-button>
+                  <t-button block variant="text" v-else @click="onClickApply">
+                    <lock-off-icon slot="icon" />未启用
+                  </t-button>
+                </t-col>
+                <t-col flex="none">
+                  <t-divider layout="vertical" />
+                </t-col>
+                <t-col flex="auto">
+                  <t-button
+                    block
+                    variant="text"
+                    v-if="theme.isCurrent"
+                    @click="onClickSetting"
+                  >
+                    <setting-icon slot="icon" />设置
+                  </t-button>
+                  <t-button block variant="text" disabled v-else>
+                    <setting-icon slot="icon" />设置
+                  </t-button>
+                </t-col>
+                <t-col flex="none">
+                  <t-divider layout="vertical" />
+                </t-col>
+                <t-col flex="auto">
+                  <t-button block variant="text" @click="onClickDelete">
+                    <delete-icon slot="icon" />删除
+                  </t-button>
+                </t-col>
+              </t-row>
+            </template>
+          </t-card>
+        </div>
+      </div>
+      <ThemeInstallDialog
+        ref="themeInstallDialog"
+        @installSuccess="onInstallSuccess"
+      ></ThemeInstallDialog>
     </template>
   </PageView>
 </template>
 
 <script>
 import PageView from "@/layouts/PageView";
+import ThemeInstallDialog from "@/views/appearance/components/ThemeInstallDialog";
 import {
   SettingIcon,
   LockOnIcon,
@@ -93,41 +103,43 @@ export default {
     onClickDelete() {
       this.$message.success("未实现");
     },
-    fetchCurrentThemeID() {
+    onClickInstall() {
+      this.$refs.themeInstallDialog.open();
+    },
+    onInstallSuccess() {
+      this.fetchData();
+    },
+    fetchData() {
       this.$request
         .get("/theme/current/id")
         .then((res) => {
           this.currentThemeID = res.data;
-          console.log("current:", this.currentThemeID);
+          this.$request
+            .get("/themes")
+            .then((res) => {
+              this.themes = res.data;
+              for (let theme of this.themes) {
+                if (theme.id === this.currentThemeID) {
+                  theme.isCurrent = true;
+                  this.currentTheme = theme;
+                }
+              }
+            })
+            .catch(() => {
+              this.$message.error("获取主题列表失败");
+            });
         })
         .catch(() => {
           this.$message.error("获取当前主题失败");
         });
     },
-    fetchThemes() {
-      this.$request
-        .get("/themes")
-        .then((res) => {
-          this.themes = res.data;
-          for (let theme of this.themes) {
-            if (theme.id === this.currentThemeID) {
-              theme.isCurrent = true;
-              this.currentTheme = theme;
-            }
-          }
-          console.log(this.themes);
-        })
-        .catch(() => {
-          this.$message.error("获取主题列表失败");
-        });
-    },
   },
   beforeMount() {
-    this.fetchCurrentThemeID();
-    this.fetchThemes();
+    this.fetchData();
   },
   components: {
     PageView,
+    ThemeInstallDialog,
     SettingIcon,
     LockOnIcon,
     LockOffIcon,
@@ -167,6 +179,14 @@ export default {
     .page-header-bar-operator-item {
       margin-left: 15px;
     }
+  }
+}
+
+.themes-container {
+  display: flex;
+  .card-container {
+    margin: 0 10px;
+    width: 24.9999%;
   }
 }
 </style>

@@ -14,19 +14,23 @@
         <t-list-item v-for="attach in attachments" :key="attach.id">
           <div class="image-wrapper" @click="openDetailDrawer(attach)">
             <a href="javascript:;">
-              <img :src="'http://localhost:8080'+attach.thumbURL" />
+              <img :src="'http://localhost:8080' + attach.thumbURL" />
             </a>
           </div>
         </t-list-item>
       </t-list>
       <template #footer>
-        <t-button @click="upload">上传附件</t-button>
+        <t-button @click="onClickUpload">上传附件</t-button>
       </template>
     </t-drawer>
     <AttachDetailDrawer
-    :attachment="selectedAttachment"
+      ref="attachDetailDrawer"
+      :attachment="selectedAttachment"
     ></AttachDetailDrawer>
-    <AttachUploadDialog @uploadSuccess="syncData"></AttachUploadDialog>
+    <AttachUploadDialog
+      ref="attachUploadDialog"
+      @uploadSuccess="syncData"
+    ></AttachUploadDialog>
   </div>
 </template>
 
@@ -38,21 +42,21 @@ export default {
   name: "AttachListDrawer",
   data() {
     return {
+      visible: false,
       attachments: [],
       selectedAttachment: null,
     };
   },
-  computed: {
-    visible() {
-      return this.$store.state.app.attachListDrawerVisible;
-    },
-  },
+  computed: {},
   methods: {
-    close() {
-      this.$store.commit("CLOSE_ATTACH_LIST_DRAWER");
+    open() {
+      this.visible = true;
     },
-    upload() {
-      this.$store.commit("OPEN_ATTACH_UPLOAD_DIALOG");
+    close() {
+      this.visible = false;
+    },
+    onClickUpload() {
+      this.$refs.attachUploadDialog.open();
     },
     // 点击加载更多，状态切换为「加载中」
     loadMore() {
@@ -60,21 +64,21 @@ export default {
       this.asyncLoadingRadio = "loading";
     },
     openDetailDrawer(attach) {
-      this.selectedAttachment = attach
-      this.$store.commit("OPEN_ATTACH_DETAIL_DRAWER");
+      this.selectedAttachment = attach;
+      this.$refs.attachDetailDrawer.open();
     },
     syncData() {
       this.$request
-      .get("attachments")
-      .then((res) => {
-        if (res.status === 0) {
-          this.attachments = res.data.list;
-        }
-      })
-      .catch(() => {
-        this.$message.error("获取附件列表失败");
-      });
-    }
+        .get("attachments")
+        .then((res) => {
+          if (res.status === 0) {
+            this.attachments = res.data.list;
+          }
+        })
+        .catch(() => {
+          this.$message.error("获取附件列表失败");
+        });
+    },
   },
   watch: {
     // 也可以使用插槽自定义加载内容
@@ -85,7 +89,7 @@ export default {
         this.asyncLoading = this.asyncLoadingRadio;
       }
     },
-    "$store.state.app.attachListDrawerVisible": {
+    visible: {
       handler: function (newVal) {
         if (newVal) {
           this.syncData();

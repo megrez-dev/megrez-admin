@@ -10,27 +10,24 @@
       <div class="upload-container">
         <t-upload
           v-model="files"
-          theme="image"
-          :onSuccess="handleUploadSuccess"
-          :onFail="handleUploadFail"
-          :requestMethod="uploadMethod"
+          :onSuccess="handleInstallSuccess"
+          :onFail="handleInstallFail"
+          :requestMethod="installMethod"
           draggable
-          accept="image/*"
-        ></t-upload>
+        />
       </div>
     </t-dialog>
   </div>
 </template>
 <script>
 export default {
-  name: "AttachUploadDialog",
+  name: "themeInstallDialog",
   data() {
     return {
       visible: false,
       files: [],
     };
   },
-  computed: {},
   methods: {
     open() {
       this.visible = true;
@@ -38,16 +35,16 @@ export default {
     close() {
       this.visible = false;
     },
-    handleUploadFail() {
-      this.$message.error("上传失败");
+    handleInstallFail() {
+      this.$message.error("安装失败");
     },
-    handleUploadSuccess() {
-      this.$message.success("上传成功");
-      this.$emit("uploadSuccess");
+    handleInstallSuccess() {
+      this.$message.success("安装成功");
+      this.$emit("installSuccess");
       this.files = [];
       this.close();
     },
-    uploadMethod(file) {
+    installMethod(file) {
       return new Promise((resolve) => {
         // file.percent 用于控制上传进度，如果不希望显示上传进度，则不对 file.percent 设置值即可。
         // 如果代码规范不能设置 file.percent，也可以设置 this.files
@@ -55,16 +52,14 @@ export default {
         let data = new FormData();
         data.append("file", file.raw);
         this.$request
-          .post("upload", data, {
+          .post("theme/install", data, {
             headers: { "Content-Type": "multipart/form-data" },
           })
           .then((res) => {
             if (res.status === 0) {
               resolve({
                 status: "success",
-                response: {
-                  url: res.data.url,
-                },
+                response: {},
               });
             }
           })
