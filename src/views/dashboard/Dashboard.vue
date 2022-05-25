@@ -4,7 +4,7 @@
       <div class="links-container">
         <div class="card-container">
           <div class="card-title">
-            <h2>评论列表</h2>
+            <h2>仪表盘</h2>
           </div>
           <div class="card-content">
             <h3>未实现</h3>
@@ -18,7 +18,7 @@
 <script>
 import PageView from "@/layouts/PageView";
 export default {
-  name: "Comment",
+  name: "Dashboard",
   data() {
     return {};
   },

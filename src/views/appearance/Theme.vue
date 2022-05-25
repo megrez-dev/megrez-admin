@@ -32,7 +32,12 @@
                   >
                     <lock-on-icon slot="icon" style="color: blue" />已启用
                   </t-button>
-                  <t-button block variant="text" v-else @click="onClickApply">
+                  <t-button
+                    block
+                    variant="text"
+                    v-else
+                    @click="onClickApply(theme.id)"
+                  >
                     <lock-off-icon slot="icon" />未启用
                   </t-button>
                 </t-col>
@@ -56,7 +61,21 @@
                   <t-divider layout="vertical" />
                 </t-col>
                 <t-col flex="auto">
-                  <t-button block variant="text" @click="onClickDelete">
+                  <t-button
+                    block
+                    variant="text"
+                    v-if="theme.isCurrent"
+                    disabled
+                    @click="onClickDelete(theme.id)"
+                  >
+                    <delete-icon slot="icon" />删除
+                  </t-button>
+                  <t-button
+                    block
+                    variant="text"
+                    v-else
+                    @click="onClickDelete(theme.id)"
+                  >
                     <delete-icon slot="icon" />删除
                   </t-button>
                 </t-col>
@@ -97,11 +116,21 @@ export default {
         name: "ThemeSetting",
       });
     },
-    onClickApply() {
-      this.$message.success("未实现");
+    onClickApply(value) {
+      this.$request
+        .put("option/blog_theme", {
+          value: value,
+        })
+        .then(() => {
+          this.$message.success("主题已启用");
+          this.fetchData();
+        });
     },
-    onClickDelete() {
-      this.$message.success("未实现");
+    onClickDelete(value) {
+      this.$request.delete("theme/" + value).then(() => {
+        this.$message.success("已删除主题");
+        this.fetchData();
+      });
     },
     onClickInstall() {
       this.$refs.themeInstallDialog.open();
@@ -122,8 +151,11 @@ export default {
                 if (theme.id === this.currentThemeID) {
                   theme.isCurrent = true;
                   this.currentTheme = theme;
+                  this.themes.splice(this.themes.indexOf(theme), 1);
+                  continue;
                 }
               }
+              this.themes.unshift(this.currentTheme);
             })
             .catch(() => {
               this.$message.error("获取主题列表失败");

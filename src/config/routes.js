@@ -7,20 +7,20 @@ export const menuRoutes = [
         name: 'Index',
         component: BasicLayout,
         meta: { title: '首页', icon: 'home' },
-        redirect: '/overview',
+        redirect: '/dashboard',
         children: [
             {
-                path: '/overview',
-                component: () => import('@/views/overview/Overview.vue'),
-                name: 'Overview',
-                meta: { title: '总览', icon: 'dashboard' }
+                path: '/dashboard',
+                component: () => import('@/views/dashboard/Dashboard.vue'),
+                name: 'Dashboard',
+                meta: { title: '仪表盘', icon: 'dashboard' }
             },
-            {
-                path: '/statistic',
-                component: () => import('@/views/statistic/Statistic.vue'),
-                name: 'Statistic',
-                meta: { title: '统计', icon: 'chart' }
-            },
+            // {
+            //     path: '/statistic',
+            //     component: () => import('@/views/statistic/Statistic.vue'),
+            //     name: 'Statistic',
+            //     meta: { title: '统计', icon: 'chart' }
+            // },
             {
                 path: '/article',
                 component: BlankLayout,
@@ -56,7 +56,7 @@ export const menuRoutes = [
             },
             {
                 path: '/comment',
-                component: () => import('@/views/comment/Comment.vue'),
+                component: () => import('@/views/comment/CommentList.vue'),
                 name: 'Comment',
                 meta: { title: '评论', icon: 'edit-1' }
             },
@@ -79,12 +79,12 @@ export const menuRoutes = [
                         name: 'ThemeSetting',
                         meta: { title: '主题设置', icon: 'edit-1' },
                     },
-                    {
-                        path: 'edit',
-                        component: () => import('@/views/appearance/ThemeEdit.vue'),
-                        name: 'ThemeEdit',
-                        meta: { title: '主题编辑', icon: 'edit-1' },
-                    },
+                    // {
+                    //     path: 'edit',
+                    //     component: () => import('@/views/appearance/ThemeEdit.vue'),
+                    //     name: 'ThemeEdit',
+                    //     meta: { title: '主题编辑', icon: 'edit-1' },
+                    // },
                 ],
             },
         ]
