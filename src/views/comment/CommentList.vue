@@ -17,7 +17,15 @@
                 class="t-button-link"
                 :href="'/article/' + row.id"
                 target="_blank"
-                >{{ row.title }}</a
+                v-if="row.type === 1"
+                >{{ row.article.title }}</a
+              >
+              <a
+                class="t-button-link"
+                :href="'/' + row.page.slug"
+                target="_blank"
+                v-else
+                >{{ row.page.name }}</a
               >
             </template>
             <template #status="{ row }">
@@ -27,54 +35,11 @@
               >
               <span v-else-if="row.status === 1"
                 ><t-badge dot :offset="[8, -5]" color="orange"> </t-badge
-                >草稿</span
+                >待审核</span
               >
               <span v-else>
                 <t-badge dot :offset="[8, -5]" color="red"> </t-badge>未知</span
               >
-            </template>
-            <template #categories="{ row }">
-              <t-tag
-                v-for="(category, index) in row.categories"
-                :key="index"
-                size="small"
-                theme="primary"
-                variant="light"
-                style="margin-bottom: 8px; margin-right: 8px"
-              >
-                {{ category.name }}
-              </t-tag>
-            </template>
-            <template #tags="{ row }">
-              <t-tag
-                v-for="(tag, index) in row.tags"
-                :key="index"
-                size="small"
-                theme="success"
-                variant="light"
-                style="margin-bottom: 8px; margin-right: 8px"
-              >
-                {{ tag.name }}
-              </t-tag>
-            </template>
-            <template #commentsNum="{ row }">
-              <t-badge
-                :count="row.commentsNum"
-                shape="round"
-                :offset="[-14, -5]"
-                showZero
-              >
-              </t-badge>
-            </template>
-            <template #visits="{ row }">
-              <t-badge
-                :count="row.visits"
-                shape="round"
-                color="#fcc524"
-                :offset="[-20, -5]"
-                showZero
-              >
-              </t-badge>
             </template>
             <template #op="slotProps">
               <a class="t-button-link" @click="handleClickReply(slotProps)"
@@ -105,22 +70,16 @@ export default {
       columns: [
         {
           colKey: "title",
-          title: "标题",
+          title: "文章/页面",
+        },
+        {
+          colKey: "content",
+          title: "内容",
         },
         {
           colKey: "status",
           title: "状态",
           width: "100px",
-        },
-        {
-          width: 80,
-          colKey: "commentsNum",
-          title: "评论",
-        },
-        {
-          width: 90,
-          colKey: "visits",
-          title: "访问量",
         },
         {
           colKey: "publishTime",
@@ -174,7 +133,7 @@ export default {
     },
     handleClickDelete(slotProps) {
       this.$request
-        .delete("article/" + slotProps.row.id)
+        .delete("comment/" + slotProps.row.id)
         .then((res) => {
           if (res.status === 0) {
             for (var i = 0; i < this.commentList.length; i++) {
