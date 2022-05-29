@@ -61,7 +61,10 @@
             </template>
           </t-table>
         </div>
-        <CommentReplyDialog ref="commentReplyDialog"></CommentReplyDialog>
+        <CommentReplyDialog
+          ref="commentReplyDialog"
+          :comment="replyComment"
+        ></CommentReplyDialog>
       </div>
     </template>
   </PageView>
@@ -118,6 +121,7 @@ export default {
           title: "操作",
         },
       ],
+      replyComment: null,
       pagination: {
         current: 1,
         pageSize: 10,
@@ -152,7 +156,8 @@ export default {
       this.pagination.pageSize = pageInfo.pagination.pageSize;
       this.fetchComments(this.pagination);
     },
-    handleClickReply() {
+    handleClickReply(slotProps) {
+      this.replyComment = slotProps.row;
       this.$refs.commentReplyDialog.open();
     },
     handleClickDelete(slotProps) {
