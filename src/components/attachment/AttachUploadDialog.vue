@@ -1,25 +1,23 @@
 <template>
-  <div>
-    <t-dialog
-      :visible="visible"
-      :header="null"
-      :confirmBtn="null"
-      :cancelBtn="null"
-      :onClose="close"
-    >
-      <div class="upload-container">
-        <t-upload
-          v-model="files"
-          theme="image"
-          :onSuccess="handleUploadSuccess"
-          :onFail="handleUploadFail"
-          :requestMethod="uploadMethod"
-          draggable
-          accept="image/*"
-        ></t-upload>
-      </div>
-    </t-dialog>
-  </div>
+  <t-dialog
+    :visible="visible"
+    :header="null"
+    :confirmBtn="null"
+    :cancelBtn="null"
+    :onClose="close"
+  >
+    <div class="upload-container">
+      <t-upload
+        v-model="files"
+        theme="image"
+        :onSuccess="handleUploadSuccess"
+        :onFail="handleUploadFail"
+        :requestMethod="uploadMethod"
+        draggable
+        accept="image/*"
+      ></t-upload>
+    </div>
+  </t-dialog>
 </template>
 <script>
 export default {

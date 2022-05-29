@@ -15,7 +15,7 @@
             <template #title="{ row }">
               <a
                 class="t-button-link"
-                :href="'/article/' + row.id"
+                :href="'/article/' + row.article.id"
                 target="_blank"
                 v-if="row.type === 1"
                 >{{ row.article.title }}</a
@@ -26,6 +26,15 @@
                 target="_blank"
                 v-else
                 >{{ row.page.name }}</a
+              >
+            </template>
+            <template #author="{ row }">
+              <a
+                class="t-button-link"
+                :href="row.site"
+                target="_blank"
+                v-if="row.site != ''"
+                >{{ row.author }}</a
               >
             </template>
             <template #status="{ row }">
@@ -52,6 +61,7 @@
             </template>
           </t-table>
         </div>
+        <CommentReplyDialog ref="commentReplyDialog"></CommentReplyDialog>
       </div>
     </template>
   </PageView>
@@ -60,6 +70,7 @@
 <script>
 import { timeAgo } from "@/utils/datetime.js";
 import PageView from "@/layouts/PageView";
+import CommentReplyDialog from "./components/CommentReplyDialog.vue";
 
 export default {
   name: "CommentList",
@@ -77,15 +88,28 @@ export default {
           title: "内容",
         },
         {
+          colKey: "author",
+          title: "作者",
+        },
+        {
+          colKey: "mail",
+          title: "邮箱",
+        },
+        {
+          colKey: "ip",
+          title: "IP",
+          width: "150px",
+        },
+        {
           colKey: "status",
           title: "状态",
           width: "100px",
         },
         {
-          colKey: "publishTime",
+          colKey: "createTime",
           title: "发布时间",
-          cell(h, { row: { publishTime } }) {
-            return timeAgo(publishTime);
+          cell(h, { row: { createTime } }) {
+            return timeAgo(createTime);
           },
         },
         {
@@ -128,8 +152,8 @@ export default {
       this.pagination.pageSize = pageInfo.pagination.pageSize;
       this.fetchComments(this.pagination);
     },
-    handleClickDetail() {
-      this.$message.info("未实现");
+    handleClickReply() {
+      this.$refs.commentReplyDialog.open();
     },
     handleClickDelete(slotProps) {
       this.$request
@@ -151,7 +175,7 @@ export default {
         });
     },
   },
-  components: { PageView },
+  components: { PageView, CommentReplyDialog },
 };
 </script>
 <style lang="less" scoped>
