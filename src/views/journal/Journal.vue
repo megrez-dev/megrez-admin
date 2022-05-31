@@ -5,7 +5,7 @@
         <div class="card-container">
           <t-row justify="space-between">
             <div class="left-operation-container">
-              <t-button>
+              <t-button @click="onClickNew">
                 <add-icon slot="icon" />
                 写日志
               </t-button>
@@ -36,6 +36,7 @@
           </t-list>
         </div>
       </div>
+      <NewJournalDialog ref="newJournalDialog"></NewJournalDialog>
     </template>
   </PageView>
 </template>
@@ -44,6 +45,7 @@
 import { AddIcon } from "tdesign-icons-vue";
 import { Icon } from "tdesign-icons-vue";
 import PageView from "@/layouts/PageView";
+import NewJournalDialog from "./components/NewJournalDialog";
 
 export default {
   name: "Journal",
@@ -51,6 +53,7 @@ export default {
     Icon,
     AddIcon,
     PageView,
+    NewJournalDialog,
   },
   data() {
     return {
@@ -78,6 +81,11 @@ export default {
         },
       ],
     };
+  },
+  methods: {
+    onClickNew() {
+      this.$refs.newJournalDialog.open();
+    },
   },
 };
 </script>

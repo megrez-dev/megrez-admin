@@ -64,6 +64,7 @@
         <CommentReplyDialog
           ref="commentReplyDialog"
           :comment="replyComment"
+          @replySuccess="onReplySuccess"
         ></CommentReplyDialog>
       </div>
     </template>
@@ -129,7 +130,7 @@ export default {
     };
   },
   mounted() {
-    this.fetchComments(this.pagination);
+    this.fetchComments();
   },
   methods: {
     fetchComments(pagination = this.pagination) {
@@ -138,7 +139,7 @@ export default {
       this.$request
         .get("comments?pageNum=" + current + "&pageSize=" + pageSize)
         .then((res) => {
-          this.commentList = res.data.list;
+          this.commentList = res.data.list ? res.data.list : [];
           this.pagination = {
             ...pagination,
             total: res.data.total,
@@ -154,7 +155,7 @@ export default {
     rehandleChange(pageInfo) {
       this.pagination.current = pageInfo.pagination.current;
       this.pagination.pageSize = pageInfo.pagination.pageSize;
-      this.fetchComments(this.pagination);
+      this.fetchComments();
     },
     handleClickReply(slotProps) {
       this.replyComment = slotProps.row;
@@ -163,21 +164,17 @@ export default {
     handleClickDelete(slotProps) {
       this.$request
         .delete("comment/" + slotProps.row.id)
-        .then((res) => {
-          if (res.status === 0) {
-            for (var i = 0; i < this.commentList.length; i++) {
-              if (this.commentList[i].id === slotProps.row.id) {
-                this.commentList.splice(i, 1);
-                break;
-              }
-            }
-            this.$message.success("删除成功");
-          }
+        .then(() => {
+          this.$message.success("删除成功");
+          this.fetchComments();
         })
         .catch(() => {
           this.$message.warning("删除失败");
           // TODO: 换成修改按钮状态
         });
+    },
+    onReplySuccess() {
+      this.fetchComments();
     },
   },
   components: { PageView, CommentReplyDialog },

@@ -66,7 +66,7 @@ export default {
         this.$request.post("login", this.loginForm).then((res) => {
           this.$message.success("登录成功");
           this.$store.commit("SET_TOKEN", res.data);
-          this.$router.push({ name: "Overview" });
+          this.$router.push({ name: "Dashboard" });
         });
       } else {
         this.$message.error(firstError);

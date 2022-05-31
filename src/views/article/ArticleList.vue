@@ -168,7 +168,7 @@ export default {
       this.$request
         .get("articles?pageNum=" + current + "&pageSize=" + pageSize)
         .then((res) => {
-          this.articleList = res.data.list;
+          this.articleList = res.data.list ? res.data.list : [];
           this.pagination = {
             ...pagination,
             total: res.data.total,

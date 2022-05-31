@@ -8,6 +8,9 @@ import axiosInstance from '@/utils/request'
 import VueClipboard from 'vue-clipboard2'
 import TDesign from 'tdesign-vue'
 import VueStorage from 'vue-ls'
+import VueViewer from 'v-viewer'
+
+import 'viewerjs/dist/viewer.css'
 import 'tdesign-vue/es/style/index.css';
 
 Vue.config.productionTip = false
@@ -15,6 +18,11 @@ Vue.config.productionTip = false
 Vue.use(TDesign);
 Vue.use(VueStorage, StorageConfig)
 Vue.use(VueClipboard)
+Vue.use(VueViewer, {
+  defaultOptions: {
+    zIndex: 9999
+  }
+})
 
 Vue.prototype.$request = axiosInstance
 

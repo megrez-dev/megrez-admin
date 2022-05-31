@@ -8,7 +8,7 @@
     :onConfirm="replyComment"
   >
     <t-textarea
-      v-model="content"
+      v-model="newComment.content"
       placeholder="暂不支持 Markdown 评论"
       :autosize="{ minRows: 10 }"
     ></t-textarea>
@@ -21,7 +21,9 @@ export default {
   data() {
     return {
       visible: false,
-      content: "",
+      newComment: {
+        content: "",
+      },
     };
   },
   props: {
@@ -37,8 +39,25 @@ export default {
       this.visible = false;
     },
     replyComment() {
-      this.$message.info("回复评论");
-      console.log(this.comment);
+      if (this.comment.rootID === 0) {
+        this.newComment.rootID = this.comment.id;
+      } else {
+        this.newComment.rootID = this.comment.rootID;
+      }
+      this.newComment.parentID = this.comment.id;
+      this.newComment.articleID = this.comment.article.id;
+      this.newComment.pageID = this.comment.page.id;
+      this.newComment.type = this.comment.type;
+      this.$request
+        .post("/comment", this.newComment)
+        .then(() => {
+          this.$message.success("回复成功");
+          this.$emit("replySuccess");
+          this.close();
+        })
+        .catch(() => {
+          this.$message.error("回复失败");
+        });
     },
   },
 };
