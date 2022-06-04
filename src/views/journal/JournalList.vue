@@ -48,7 +48,7 @@ import PageView from "@/layouts/PageView";
 import NewJournalDialog from "./components/NewJournalDialog";
 
 export default {
-  name: "Journal",
+  name: "JournalList",
   components: {
     Icon,
     AddIcon,
@@ -83,6 +83,25 @@ export default {
     };
   },
   methods: {
+    fetchJournals(pagination = this.pagination) {
+      this.isJournalListLoading = true;
+      const { current, pageSize } = pagination;
+      this.$request
+        .get("journals?pageNum=" + current + "&pageSize=" + pageSize)
+        .then((res) => {
+          this.journalList = res.data.list ? res.data.list : [];
+          this.pagination = {
+            ...pagination,
+            total: res.data.total,
+          };
+        })
+        .catch(() => {
+          this.$message.error("获取评论列表失败");
+        })
+        .finally(() => {
+          this.isJournalListLoading = false;
+        });
+    },
     onClickNew() {
       this.$refs.newJournalDialog.open();
     },

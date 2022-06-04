@@ -50,7 +50,7 @@ export const menuRoutes = [
             },
             {
                 path: '/journal',
-                component: () => import('@/views/journal/Journal.vue'),
+                component: () => import('@/views/journal/JournalList.vue'),
                 name: 'Journal',
                 meta: { title: '日志', icon: 'edit-1' }
             },

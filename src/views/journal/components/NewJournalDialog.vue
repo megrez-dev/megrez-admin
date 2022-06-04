@@ -10,7 +10,7 @@
   >
     <t-textarea
       v-model="journal.content"
-      placeholder="暂不支持 Markdown 评论"
+      placeholder="暂不支持 Markdown 内容"
       :autosize="{ minRows: 5 }"
     ></t-textarea>
     <t-divider dashed></t-divider>
@@ -23,30 +23,34 @@
         @mouseleave="mouseLeave(image, index)"
       >
         <img :src="image.url" />
-        <transition name="fade" mode="out-in">
-          <div class="uploaded-files-mask" v-show="items[index]">
-            <BrowseIcon style="cursor: pointer" @click="handlePreview(image)" />
-            <t-divider layout="vertical" />
-            <DeleteIcon style="cursor: pointer" @click="handleDelete(index)" />
-          </div>
-        </transition>
+        <div class="uploaded-files-mask" v-show="items[index]">
+          <BrowseIcon style="cursor: pointer" @click="handlePreview(index)" />
+          <t-divider layout="vertical" />
+          <DeleteIcon style="cursor: pointer" @click="handleDelete(index)" />
+        </div>
       </div>
+      <t-upload
+        action="https://service-bv448zsw-1257786608.gz.apigw.tencentcs.com/api/upload-demo"
+        v-model="images"
+        theme="custom"
+        tips="最多上传 9 张图片"
+        accept="image/*"
+        multiple
+        :onSuccess="uploadSuccess"
+        :max="9"
+        v-if="images.length < 9"
+      >
+        <div class="new-upload-box">
+          <div class="new-upload-box-icon"><AddIcon /></div>
+          <div class="new-upload-box-text">上传图片</div>
+        </div>
+      </t-upload>
     </div>
-    <t-upload
-      action="https://service-bv448zsw-1257786608.gz.apigw.tencentcs.com/api/upload-demo"
-      v-model="images"
-      theme="custom"
-      tips="最多上传 9 张图片"
-      accept="image/*"
-      multiple
-      :onSuccess="uploadSuccess"
-      :max="9"
-    ></t-upload>
   </t-dialog>
 </template>
 
 <script>
-import { BrowseIcon, DeleteIcon } from "tdesign-icons-vue";
+import { BrowseIcon, DeleteIcon, AddIcon } from "tdesign-icons-vue";
 export default {
   name: "NewJournalDialog",
   data() {
@@ -54,6 +58,8 @@ export default {
       visible: false,
       journal: {
         content: "",
+        private: false,
+        status: 0,
       },
       images: [],
       items: [],
@@ -67,7 +73,22 @@ export default {
       this.visible = false;
     },
     publishJournal() {
-      this.$message.info("未实现");
+      if (this.journal.content === "" && this.images.length === 0) {
+        this.$message.warning("请填写内容或者上传图片");
+        return;
+      }
+      this.journal.images = this.images.map((image) => image.url);
+      this.$request
+        .post("/journal", this.journal)
+        .then(() => {
+          this.$message.success("发布成功");
+          this.close();
+          this.journal.content = "";
+          this.images = [];
+        })
+        .catch(() => {
+          this.$message.error("发布失败");
+        });
     },
     mouseEnter(image, index) {
       this.$set(this.items, index, true);
@@ -76,13 +97,14 @@ export default {
       this.$set(this.items, index, false);
     },
     uploadSuccess() {
-      this.items = this.images.map(() => {
-        return false;
-      });
+      this.items = this.images.map(() => false);
     },
-    handlePreview(image) {
+    handlePreview(index) {
       this.$viewerApi({
-        images: [image.url],
+        options: {
+          initialViewIndex: index,
+        },
+        images: this.images.map((image) => image.url),
       });
     },
     handleDelete(index) {
@@ -94,6 +116,7 @@ export default {
   components: {
     BrowseIcon,
     DeleteIcon,
+    AddIcon,
   },
 };
 </script>
@@ -104,12 +127,13 @@ export default {
   display: flex;
   flex-wrap: wrap;
   .uploaded-files-item {
+    background-color: @bg-color-secondarycontainer;
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
-    width: 128px;
-    height: 128px;
+    width: 120px;
+    height: 120px;
     margin: 0 10px 10px 0;
     border: 1px solid @border-level-2-color;
     img {
@@ -132,24 +156,21 @@ export default {
       bottom: 0;
     }
   }
-}
-
-.fade-enter-from {
-  opacity: 0;
-}
-.fade-enter-active {
-  transition: all 0.5s;
-}
-.fade-enter-to {
-  opcaity: 0;
-}
-.fade-leave-from {
-  opacity: 1;
-}
-.fade-leave-active {
-  transition: all 2s;
-}
-.fade-leave-to {
-  opcaity: 0;
+  .new-upload-box {
+    background-color: @bg-color-secondarycontainer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin: 0 10px 10px 0;
+    cursor: pointer;
+    border: 1px solid @border-level-2-color;
+    .new-upload-box-icon {
+      margin-bottom: 20px;
+    }
+  }
 }
 </style>
