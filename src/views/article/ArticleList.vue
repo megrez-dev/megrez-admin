@@ -218,7 +218,7 @@ export default {
   components: { AddIcon, PageView },
 };
 </script>
-<style lang="less" scoped>
+<style lang="less">
 @import "@/style/variables";
 @import "@/style/index";
 
@@ -235,5 +235,9 @@ export default {
       margin-bottom: 16px;
     }
   }
+}
+.t-table th,
+.t-table td {
+  padding: 8px 12px;
 }
 </style>

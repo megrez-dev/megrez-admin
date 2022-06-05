@@ -1,16 +1,7 @@
 <template>
   <PageView>
     <template slot="content">
-      <div class="links-container">
-        <div class="card-container">
-          <div class="card-title">
-            <h2>仪表盘</h2>
-          </div>
-          <div class="card-content">
-            <h3>未实现</h3>
-          </div>
-        </div>
-      </div>
+      <t-card title="仪表盘" :bordered="false"> 未实现 </t-card>
     </template>
   </PageView>
 </template>
@@ -21,6 +12,11 @@ export default {
   name: "Dashboard",
   data() {
     return {};
+  },
+  methods: {
+    clickHandler() {
+      this.$$message.info("未实现");
+    },
   },
   components: {
     PageView,

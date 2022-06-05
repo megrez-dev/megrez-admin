@@ -1,128 +1,224 @@
 <template>
   <PageView>
     <template slot="content">
-      <div class="article-list-container">
-        <div class="card-container">
-          <t-row justify="space-between">
-            <div class="left-operation-container">
-              <t-button @click="onClickNew">
-                <add-icon slot="icon" />
-                写日志
-              </t-button>
-            </div>
-          </t-row>
-          <t-list :split="true">
-            <t-list-item v-for="(item, index) in commentsData" :key="index">
-              <template #content>
-                <t-comment
-                  :avatar="item.avatar"
-                  :author="item.author"
-                  :datetime="item.datetime"
-                  :content="item.content"
+      <t-list
+        :split="true"
+        :async-loading="asyncLoading"
+        @load-more="fetchJournals"
+      >
+        <template #header>
+          <div class="left-operation-container">
+            <t-button @click="onClickNew">
+              <add-icon slot="icon" />
+              写日志
+            </t-button>
+          </div>
+        </template>
+        <t-list-item v-for="(item, i) in journalList" :key="i">
+          <template #content>
+            <div class="journal-list-item-container">
+              <div class="journal-list-item-content">
+                <span>{{ item.content }}</span>
+              </div>
+              <div class="journal-list-item-images">
+                <div
+                  class="journal-list-image-box"
+                  v-for="(image, j) in item.images"
+                  :key="j"
+                  :style="{ backgroundImage: `url(${image})` }"
+                  @mouseenter="mouseEnter(i, j)"
+                  @mouseleave="mouseLeave(i, j)"
                 >
-                  <template #actions>
-                    <span key="thumbUp">
-                      <icon name="thumb-up" />
-                      <span class="action-text">6</span>
-                    </span>
-                    <span key="chat">
-                      <icon name="chat" />
-                      <span class="action-text">回复</span>
-                    </span>
-                  </template>
-                </t-comment>
-              </template>
-            </t-list-item>
-          </t-list>
-        </div>
-      </div>
+                  <div
+                    class="journal-list-image-mask"
+                    v-show="maskVisible[i][j]"
+                  >
+                    <BrowseIcon
+                      style="cursor: pointer"
+                      size="large"
+                      @click="handlePreview(i, j)"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="journal-list-item-meta">
+                <span class="journal-list-item-time">{{
+                  timeAgo(item.createTime)
+                }}</span>
+                <span class="journal-list-item-actions">
+                  <t-button
+                    shape="square"
+                    variant="text"
+                    @click="handleEdit(item)"
+                    ><EditIcon slot="icon"
+                  /></t-button>
+                  <t-button
+                    shape="square"
+                    variant="text"
+                    @click="handleDelete(item)"
+                    ><DeleteIcon slot="icon"
+                  /></t-button>
+                </span>
+              </div>
+            </div>
+          </template>
+        </t-list-item>
+      </t-list>
       <NewJournalDialog ref="newJournalDialog"></NewJournalDialog>
     </template>
   </PageView>
 </template>
 
 <script>
-import { AddIcon } from "tdesign-icons-vue";
-import { Icon } from "tdesign-icons-vue";
+import { AddIcon, BrowseIcon, EditIcon, DeleteIcon } from "tdesign-icons-vue";
 import PageView from "@/layouts/PageView";
 import NewJournalDialog from "./components/NewJournalDialog";
+import { timeAgo } from "@/utils/datetime.js";
 
 export default {
   name: "JournalList",
   components: {
-    Icon,
     AddIcon,
+    BrowseIcon,
+    EditIcon,
+    DeleteIcon,
     PageView,
     NewJournalDialog,
   },
   data() {
     return {
-      commentsData: [
-        {
-          id: "A",
-          avatar: "https://tdesign.gtimg.com/site/avatar.jpg",
-          author: "评论作者名A",
-          datetime: "今天16:38",
-          content: "评论作者名A写的评论内容。",
-        },
-        {
-          id: "B",
-          avatar: "https://tdesign.gtimg.com/site/avatar.jpg",
-          author: "评论作者名B",
-          datetime: "今天16:38",
-          content: "评论作者名B写的评论内容。",
-        },
-        {
-          id: "C",
-          avatar: "https://tdesign.gtimg.com/site/avatar.jpg",
-          author: "评论作者名C",
-          datetime: "今天16:38",
-          content: "评论作者名C写的评论内容。",
-        },
-      ],
+      asyncLoading: "load-more",
+      pagination: {
+        current: 1,
+        pageSize: 10,
+        total: 0,
+      },
+      journalList: [],
+      maskVisible: [],
     };
   },
   methods: {
-    fetchJournals(pagination = this.pagination) {
-      this.isJournalListLoading = true;
-      const { current, pageSize } = pagination;
+    fetchJournals() {
+      this.asyncLoading = "loading";
       this.$request
-        .get("journals?pageNum=" + current + "&pageSize=" + pageSize)
+        .get(
+          "journals?pageNum=" +
+            this.pagination.current +
+            "&pageSize=" +
+            this.pagination.pageSize
+        )
         .then((res) => {
-          this.journalList = res.data.list ? res.data.list : [];
+          this.journalList = res.data.list
+            ? this.journalList.concat(...res.data.list)
+            : this.journalList;
+          if (res.data.current * res.data.pageSize >= res.data.total) {
+            this.asyncLoading = "";
+          } else {
+            this.asyncLoading = "load-more";
+          }
           this.pagination = {
-            ...pagination,
+            current: res.data.current + 1,
+            pageSize: res.data.pageSize,
             total: res.data.total,
           };
+          for (let index = 0; index < this.journalList.length; index++) {
+            this.$set(
+              this.maskVisible,
+              index,
+              this.journalList[index].images.map(() => false)
+            );
+          }
         })
         .catch(() => {
-          this.$message.error("获取评论列表失败");
-        })
-        .finally(() => {
-          this.isJournalListLoading = false;
+          this.asyncLoading = "load-more";
+          this.$message.error("获取日志列表失败");
         });
     },
     onClickNew() {
       this.$refs.newJournalDialog.open();
     },
+    timeAgo(time) {
+      return timeAgo(time);
+    },
+    mouseEnter(i, j) {
+      this.$set(this.maskVisible[i], j, true);
+    },
+    mouseLeave(i, j) {
+      this.$set(this.maskVisible[i], j, false);
+    },
+    handlePreview(i, j) {
+      this.$viewerApi({
+        options: {
+          initialViewIndex: j,
+        },
+        images: this.journalList[i].images,
+      });
+    },
+    handleEdit(journal) {
+      this.$message.info("未实现");
+      console.log(journal);
+    },
+    handleDelete(journal) {
+      this.$message.info("未实现");
+      console.log(journal);
+    },
+  },
+  mounted() {
+    this.fetchJournals();
   },
 };
 </script>
-<style lang="less" scoped>
+<style lang="less">
 @import "@/style/variables";
-
-.article-list-container {
-  .card-container {
-    padding: 16px 24px;
-    background-color: @bg-color-container;
-    border-radius: 2px;
-    width: 100%;
+.t-list-item__content {
+  width: 100%;
+}
+.journal-list-item-container {
+  // display: flex;
+  // flex-direction: column;
+  width: 100%;
+  .journal-list-item-content {
+    margin-bottom: 10px;
+  }
+  .journal-list-item-images {
     display: flex;
-    flex-direction: column;
-    .left-operation-container {
-      padding: 0 0 6px 0;
-      margin-bottom: 16px;
+    flex-wrap: wrap;
+    .journal-list-image-box {
+      border-radius: 6px;
+      position: relative;
+      margin: 0 10px 10px 0;
+      width: 100px;
+      height: 100px;
+      background-position: 50% 50%;
+      background-size: cover;
+      &:hover {
+        transform: scale(1.01);
+      }
+      .journal-list-image-mask {
+        border-radius: 6px;
+        background-color: @text-color-secondary;
+        color: @bg-color-container;
+        transition: opacity 0.5s ease-in-out;
+        will-change: transform;
+        opacity: 100;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+      }
     }
+  }
+  .journal-list-item-time {
+    font-size: 12px;
+    line-height: 24px;
+    color: @text-color-placeholder;
+  }
+  .journal-list-item-actions {
+    float: right;
   }
 }
 </style>
