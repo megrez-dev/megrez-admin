@@ -6,6 +6,7 @@
       :onClose="close"
       :closeBtn="true"
       size="480px"
+      :zIndex="2600"
       :onOverlayClick="close"
       placement="right"
     >
@@ -62,13 +63,9 @@ export default {
   name: "AttachDetailDrawer",
   data() {
     return {
+      attachment: {},
       visible: false,
     };
-  },
-  props: {
-    attachment: {
-      required: true,
-    },
   },
   computed: {
     attachmentStorageType() {
@@ -81,8 +78,9 @@ export default {
     },
   },
   methods: {
-    open() {
+    open(attachment) {
       this.visible = true;
+      this.attachment = attachment;
     },
     close() {
       this.visible = false;
@@ -92,21 +90,11 @@ export default {
     },
     copyURL() {
       this.$copyText(this.attachment.url);
-      this.$message.success("复制成功");
+      this.$message.success("已复制");
     },
     copyMarkdown() {
       this.$copyText(`![${this.attachment.fileName}](${this.attachment.url})`);
-      this.$message.success("复制成功");
-    },
-  },
-  watch: {
-    // 也可以使用插槽自定义加载内容
-    asyncLoadingRadio(val) {
-      if (val === "loading-custom") {
-        this.asyncLoading = () => <div> 没有更多数据了 </div>;
-      } else {
-        this.asyncLoading = this.asyncLoadingRadio;
-      }
+      this.$message.success("已复制");
     },
   },
   components: { FileCopyIcon },

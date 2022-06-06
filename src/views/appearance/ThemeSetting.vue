@@ -87,7 +87,7 @@
                       theme="primary"
                       shape="square"
                       variant="outline"
-                      @click="openAttachDrawer"
+                      @click="openAttachSelectDrawer(tab, item)"
                       ><image-icon slot="icon"
                     /></t-button>
                   </t-input-group>
@@ -96,14 +96,17 @@
             </div>
           </t-tab-panel>
         </t-tabs>
-        <AttachListDrawer></AttachListDrawer>
+        <AttachSelectDrawer
+          ref="attachSelectDrawer"
+          @select="selectAttach"
+        ></AttachSelectDrawer>
       </div>
     </template>
   </PageView>
 </template>
 <script>
 import { Icon, ImageIcon } from "tdesign-icons-vue";
-import AttachListDrawer from "@/components/attachment/AttachListDrawer.vue";
+import AttachSelectDrawer from "@/components/attachment/AttachSelectDrawer.vue";
 import PageView from "@/layouts/PageView";
 export default {
   name: "ThemeSetting",
@@ -113,11 +116,16 @@ export default {
         tabs: [],
       },
       currentTheme: "",
+      selectedAttachTabIndex: 0,
+      selectedAttachItemIndex: 0,
     };
   },
   methods: {
-    openAttachDrawer() {
-      this.$store.commit("OPEN_ATTACH_LIST_DRAWER");
+    openAttachSelectDrawer(tab, item) {
+      this.$refs.attachSelectDrawer.open();
+      this.selectedAttachTabIndex = this.themeConfig.tabs.indexOf(tab);
+      this.selectedAttachItemIndex =
+        this.themeConfig.tabs[this.selectedAttachTabIndex].items.indexOf(item);
     },
     onClickSave() {
       this.$request
@@ -149,6 +157,11 @@ export default {
         this.currentTheme = res.data;
       });
     },
+    selectAttach(attach) {
+      this.themeConfig.tabs[this.selectedAttachTabIndex].items[
+        this.selectedAttachItemIndex
+      ].value = attach.url;
+    },
   },
   beforeMount() {
     this.fetchConfig();
@@ -157,7 +170,7 @@ export default {
   components: {
     Icon,
     ImageIcon,
-    AttachListDrawer,
+    AttachSelectDrawer,
     PageView,
   },
 };

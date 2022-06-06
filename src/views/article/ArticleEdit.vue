@@ -11,6 +11,7 @@
         </div>
         <div class="vditor-container">
           <Vditor
+            ref="vditor"
             :originalContent="article.originalContent"
             @contentChange="onContentChange"
             @countWord="countWord"
@@ -136,7 +137,11 @@
                 </t-form-item>
                 <t-form-item label="封面图" name="cover">
                   <div class="article-cover-setting">
-                    <div class="article-cover-preview">
+                    <div
+                      class="article-cover-preview"
+                      @click="openCoverSelectDrawer"
+                    >
+                      <!-- TODO: 修改 placeholder 图片-->
                       <img
                         :src="
                           article.cover === ''
@@ -195,7 +200,16 @@
             </div>
           </t-tab-panel>
         </t-tabs>
-        <AttachListDrawer ref="attachListDrawer"></AttachListDrawer>
+        <AttachSelectDrawer
+          ref="attachesSelectDrawer"
+          mode="multiple"
+          @select="handleAttachSelect"
+        ></AttachSelectDrawer>
+        <AttachSelectDrawer
+          ref="coverSelectDrawer"
+          mode="single"
+          @select="handleCoverSelect"
+        ></AttachSelectDrawer>
       </div>
     </template>
     <template slot="header">
@@ -205,7 +219,10 @@
         }}</span>
         <span class="article-edit-bar-operator">
           <span class="article-edit-bar-operator-item">
-            <t-button theme="warning" variant="dashed" @click="openDrawer"
+            <t-button
+              theme="warning"
+              variant="dashed"
+              @click="openAttachesSelectDrawer"
               >附件</t-button
             >
           </span>
@@ -238,7 +255,7 @@
 
 <script>
 import Vditor from "@/views/article/components/Vditor.vue";
-import AttachListDrawer from "@/components/attachment/AttachListDrawer.vue";
+import AttachSelectDrawer from "@/components/attachment/AttachSelectDrawer.vue";
 import PageView from "@/layouts/PageView";
 import { Icon, AddIcon } from "tdesign-icons-vue";
 
@@ -340,8 +357,11 @@ export default {
           });
       }
     },
-    openDrawer() {
-      this.$refs.attachListDrawer.open();
+    openAttachesSelectDrawer() {
+      this.$refs.attachesSelectDrawer.open();
+    },
+    openCoverSelectDrawer() {
+      this.$refs.coverSelectDrawer.open();
     },
     handleUpdate() {
       //validate
@@ -464,8 +484,22 @@ export default {
         label: value,
       });
     },
+    handleAttachSelect(attaches) {
+      this.$refs.vditor.append("\n");
+      this.$refs.vditor.append(
+        attaches
+          .map((attach) => {
+            return `![${attach.fileName}](http://localhost:8080${attach.url})`;
+          })
+          .join("\n")
+      );
+      this.$refs.vditor.append("\n");
+    },
+    handleCoverSelect(attach) {
+      this.article.cover = "http://localhost:8080" + attach.url;
+    },
   },
-  components: { Vditor, AttachListDrawer, Icon, AddIcon, PageView },
+  components: { Vditor, AttachSelectDrawer, Icon, AddIcon, PageView },
   mounted() {
     // list categories
     this.$request.get("categories").then((res) => {

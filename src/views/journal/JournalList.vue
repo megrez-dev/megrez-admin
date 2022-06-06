@@ -32,12 +32,9 @@
                   <div
                     class="journal-list-image-mask"
                     v-show="maskVisible[i][j]"
+                    @click="handlePreview(i, j)"
                   >
-                    <BrowseIcon
-                      style="cursor: pointer"
-                      size="large"
-                      @click="handlePreview(i, j)"
-                    />
+                    <BrowseIcon size="large" />
                   </div>
                 </div>
               </div>
@@ -195,12 +192,13 @@ export default {
         transform: scale(1.01);
       }
       .journal-list-image-mask {
+        cursor: pointer;
         border-radius: 6px;
         background-color: @text-color-secondary;
         color: @bg-color-container;
-        transition: opacity 0.5s ease-in-out;
+        transition: all 0.2s linear;
         will-change: transform;
-        opacity: 100;
+        opacity: 0;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -209,6 +207,9 @@ export default {
         right: 0;
         top: 0;
         bottom: 0;
+        &:hover {
+          opacity: 1;
+        }
       }
     }
   }

@@ -28,23 +28,24 @@ export default {
       );
     },
     countWord(length) {
-      this.$emit(
-        "countWord",
-        length
-      )
-    }
+      this.$emit("countWord", length);
+    },
+    append(content) {
+      this.contentEditor.insertValue(content);
+    },
   },
   mounted() {
     this.contentEditor = new Vditor("vditor", {
       height: 600,
       icon: "material",
+      mode: "wysiwyg",
       input: this.contentChange,
       counter: {
         enable: true,
         type: "text",
         after: (length) => {
-          this.countWord(length)
-        }
+          this.countWord(length);
+        },
       },
       preview: {
         delay: 50,

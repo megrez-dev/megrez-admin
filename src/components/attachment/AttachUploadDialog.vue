@@ -5,6 +5,7 @@
     :confirmBtn="null"
     :cancelBtn="null"
     :onClose="close"
+    :zIndex="2601"
   >
     <div class="upload-container">
       <t-upload

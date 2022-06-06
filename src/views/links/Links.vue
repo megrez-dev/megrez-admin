@@ -161,6 +161,19 @@ export default {
 
   methods: {
     handleClickAdd() {
+      //validate
+      if (this.link.name === "") {
+        this.$message.warning("名称不能为空");
+        return;
+      }
+      if (this.link.url === "") {
+        this.$message.warning("URL不能为空");
+        return;
+      }
+      if (this.link.logo === "") {
+        this.$message.warning("LOGO不能为空");
+        return;
+      }
       this.$request
         .post("link", this.link)
         .then((res) => {
@@ -221,6 +234,19 @@ export default {
         });
     },
     handleClickUpdate() {
+      //validate
+      if (this.link.name === "") {
+        this.$message.warning("名称不能为空");
+        return;
+      }
+      if (this.link.url === "") {
+        this.$message.warning("URL不能为空");
+        return;
+      }
+      if (this.link.logo === "") {
+        this.$message.warning("LOGO不能为空");
+        return;
+      }
       this.$request
         .put("link/" + this.link.id, this.link)
         .then(() => {

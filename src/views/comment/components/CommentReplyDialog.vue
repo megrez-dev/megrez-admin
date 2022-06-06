@@ -39,6 +39,10 @@ export default {
       this.visible = false;
     },
     replyComment() {
+      if (this.newComment.content.length === 0) {
+        this.$message.warning("评论内容不能为空");
+        return;
+      }
       if (this.comment.rootID === 0) {
         this.newComment.rootID = this.comment.id;
       } else {

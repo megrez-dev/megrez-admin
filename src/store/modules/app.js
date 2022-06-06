@@ -2,7 +2,6 @@ export default {
     state: {
         collapsed: false,
         isDark: false,
-        attachListDrawerVisible: false,
         attachDetailDrawerVisible: false,
         attachUploadDialogVisible: false
     },
@@ -12,12 +11,6 @@ export default {
         },
         TOGGLE_THEME(state) {
             state.isDark = !state.isDark
-        },
-        OPEN_ATTACH_LIST_DRAWER(state) {
-            state.attachListDrawerVisible = true
-        },
-        CLOSE_ATTACH_LIST_DRAWER(state) {
-            state.attachListDrawerVisible = false
         },
         OPEN_ATTACH_DETAIL_DRAWER(state) {
             state.attachDetailDrawerVisible = true
