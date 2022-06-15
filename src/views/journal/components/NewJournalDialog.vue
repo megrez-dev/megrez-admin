@@ -23,7 +23,7 @@
           @mouseenter="mouseEnter(image, index)"
           @mouseleave="mouseLeave(image, index)"
         >
-          <img :src="'http://localhost:8080' + image" />
+          <img :src="image" />
           <div class="uploaded-files-mask" v-show="maskVisible[index]">
             <BrowseIcon style="cursor: pointer" @click="handlePreview(index)" />
             <t-divider layout="vertical" />
@@ -114,7 +114,7 @@ export default {
       this.maskVisible = this.journal.images.map(() => false);
     },
     openAttachSelectDrawer() {
-      this.$refs.attachSelectDrawer.open();
+      this.$refs.attachSelectDrawer.open(9 - this.journal.images.length);
     },
   },
   components: {

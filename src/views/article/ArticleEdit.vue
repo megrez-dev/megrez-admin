@@ -271,11 +271,10 @@ export default {
         vm.$request
           .get("article/" + articleID)
           .then((res) => {
-            console.log("res:", res);
             vm.article = res.data;
           })
           .catch(() => {
-            this.$message.warning("获取文章失败");
+            this.$message.warning("获取文章详情失败");
           });
       }
     });
@@ -489,14 +488,14 @@ export default {
       this.$refs.vditor.append(
         attaches
           .map((attach) => {
-            return `![${attach.fileName}](http://localhost:8080${attach.url})`;
+            return `![${attach.fileName}](${attach.url})`;
           })
           .join("\n")
       );
       this.$refs.vditor.append("\n");
     },
     handleCoverSelect(attach) {
-      this.article.cover = "http://localhost:8080" + attach.url;
+      this.article.cover = attach.url;
     },
   },
   components: { Vditor, AttachSelectDrawer, Icon, AddIcon, PageView },

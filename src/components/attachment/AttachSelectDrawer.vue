@@ -20,7 +20,7 @@
           @mouseenter="mouseEnter(index)"
           @mouseleave="mouseLeave(index)"
         >
-          <img :src="'http://localhost:8080' + attach.url" />
+          <img :src="attach.url" />
           <div class="image-item-mask" v-show="maskVisible[index]">
             <div @click.stop="handlePreview(attach)">
               <BrowseIcon style="cursor: pointer" />
@@ -65,6 +65,7 @@ export default {
   name: "AttachSelectDrawer",
   data() {
     return {
+      num: 0,
       visible: false,
       attachments: [],
       maskVisible: [],
@@ -80,11 +81,14 @@ export default {
     },
   },
   methods: {
-    open() {
+    open(num = 0) {
+      this.num = num;
       this.visible = true;
     },
     close() {
       this.visible = false;
+      this.selectedIndex = this.selectedIndex.map(() => false);
+      this.selectedAttaches = [];
     },
     onClickUpload() {
       this.$refs.attachUploadDialog.open();
@@ -94,7 +98,7 @@ export default {
         .get("attachments")
         .then((res) => {
           if (res.status === 0) {
-            this.attachments = res.data.list;
+            this.attachments = res.data.list ? res.data.list : [];
           }
           this.maskVisible = this.attachments.map(() => false);
           this.selectedIndex = this.attachments.map(() => false);
@@ -121,6 +125,10 @@ export default {
       if (this.mode === "single") {
         this.$emit("select", attach);
         this.close();
+      }
+      if (this.num != 0 && this.num <= this.selectedAttaches.length) {
+        this.$message.warning("最多只能选择" + this.num + "个附件");
+        return;
       }
       this.$set(this.selectedIndex, index, !this.selectedIndex[index]);
       if (this.selectedIndex[index]) {

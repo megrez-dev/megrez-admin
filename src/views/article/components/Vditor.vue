@@ -13,7 +13,7 @@ export default {
     };
   },
   props: {
-    origionContent: {
+    originalContent: {
       type: String,
       required: false,
       default: "",
@@ -62,7 +62,7 @@ export default {
         } else {
           this.contentEditor.setTheme("classic", "light");
         }
-        this.contentEditor.insertValue(this.origionContent);
+        this.contentEditor.setValue(this.originalContent);
       },
     });
   },
