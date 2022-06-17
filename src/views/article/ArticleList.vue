@@ -236,8 +236,8 @@ export default {
     }
   }
 }
-.t-table th,
-.t-table td {
-  padding: 8px 12px;
-}
+// .t-table th,
+// .t-table td {
+//   padding: 8px 12px;
+// }
 </style>

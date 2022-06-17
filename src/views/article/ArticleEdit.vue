@@ -21,7 +21,7 @@
           variant="base"
           @click="saveDraft"
         >
-          {{article.status != 1 ? '存为草稿' : '保存草稿'}}
+          {{ article.status != 1 ? '存为草稿' : '保存草稿' }}
         </t-button>
         <t-button
           class="article-edit-bar-operator-item"
@@ -42,8 +42,8 @@
       <div class="vditor-container">
         <Vditor
           ref="vditor"
-          :originalContent="article.originalContent"
-          @contentChange="onContentChange"
+          v-model="article.originalContent"
+          @vditorMounted="setDefultArticle"
           @countWord="countWord"
         ></Vditor>
       </div>
@@ -229,31 +229,18 @@ import AttachSelectDrawer from '@/components/attachment/AttachSelectDrawer.vue';
 import PageView from '@/layouts/PageView';
 import { Icon, AddIcon } from 'tdesign-icons-vue';
 
+const editMode = {
+  CREATE: 0,
+  EDIT: 1,
+}
+
 export default {
   name: 'ArticleEdit',
-  beforeRouteEnter(to, from, next) {
-    // get article id from query
-    const articleID = to.query.articleID;
-    // get article from server
-    next((vm) => {
-      if (articleID) {
-        vm.state = 1;
-        vm.$request
-          .get('article/' + articleID)
-          .then((res) => {
-            vm.article = res.data;
-            console.log(res.data);
-          })
-          .catch(() => {
-            this.$message.warning('获取文章详情失败');
-          });
-      }
-    });
-  },
+  components: { Vditor, AttachSelectDrawer, Icon, AddIcon, PageView },
   data() {
     return {
       // 0 for create, 1 for edit
-      state: 0,
+      state: editMode.CREATE,
       publishing: false, // 表示正在上传或正在更新
       saving: false, // 表示正在存草稿
       article: {
@@ -283,15 +270,64 @@ export default {
       },
     };
   },
+  watch: {
+    // 在文章编辑页跳转，只改变路由参数而不改变路由时，也需要更新默认的文章
+    $route() {
+      this.initData();
+      this.setDefultArticle();
+    },
+  },
   methods: {
-    // get content from sub component Vditor
-    onContentChange(originalContent, formatContent) {
-      this.article.originalContent = originalContent;
-      this.article.formatContent = formatContent;
+    initData() {
+      this.state = editMode.CREATE;
+      this.publishing = false;
+      this.saving = false;
+      this.article = {
+        title: '',
+        originalContent: '',
+        formatContent: '',
+        slug: '',
+        allowedComment: true,
+        isTop: false,
+        categories: [],
+        tags: [],
+        summary: '',
+        cover: '',
+        password: '',
+        wordCount: 0,
+        seoKeywords: [],
+        seoDescription: '',
+        status: 0,
+      };
+      this.categoryOptions = [];
+      this.tagOptions = [];
+      this.seoKeywordOptions = [];
+      this.showAddCategoryForm = false;
+      this.newCategory = {
+        name: '',
+        slug: '',
+      };
+    },
+    // get article from server
+    setDefultArticle() {
+      const articleID = this.$route.query.articleID;
+      if (!articleID) return;
+      this.state = editMode.EDIT;
+      this.$request
+        .get('article/' + articleID)
+        .then((res) => {
+          this.article = res.data;
+        })
+        .catch(() => {
+          this.$message.warning('获取文章详情失败');
+        });
     },
     // get word count from sub component Vditor
     countWord(length) {
       this.article.wordCount = length;
+    },
+    getFormatContent() {
+      return this.$refs.vditor.contentEditor.getHTML();
     },
     saveDraft() {
       //validate
@@ -300,8 +336,9 @@ export default {
         return;
       }
       this.saving = true;
+      this.article.formatContent = this.getFormatContent();
+      this.article.status = 1;
       if (this.state === 0) {
-        this.article.status = 1;
         this.$request
           .post('article', this.article)
           .then((res) => {
@@ -317,7 +354,6 @@ export default {
             this.saving = false;
           });
       } else {
-        this.article.status = 1;
         this.$request
           .put('article/' + this.article.id, this.article)
           .then((res) => {
@@ -334,20 +370,15 @@ export default {
           });
       }
     },
-    openAttachesSelectDrawer() {
-      this.$refs.attachesSelectDrawer.open();
-    },
-    openCoverSelectDrawer() {
-      this.$refs.coverSelectDrawer.open();
-    },
     handlePublish() {
       //validate
       if (this.article.title === '') {
         this.$message.warning('文章标题不能为空');
         return;
       }
-      this.article.status = 0;
       this.publishing = true;
+      this.article.formatContent = this.getFormatContent();
+      this.article.status = 0;
       // create
       if (this.state === 0) {
         this.$request
@@ -381,6 +412,12 @@ export default {
             this.publishing = false;
           });
       }
+    },
+    openAttachesSelectDrawer() {
+      this.$refs.attachesSelectDrawer.open();
+    },
+    openCoverSelectDrawer() {
+      this.$refs.coverSelectDrawer.open();
     },
     handleCreateCategory() {
       // remove whitespace
@@ -464,7 +501,7 @@ export default {
       this.article.cover = attach.url;
     },
   },
-  components: { Vditor, AttachSelectDrawer, Icon, AddIcon, PageView },
+
   mounted() {
     // list categories
     this.$request.get('categories').then((res) => {
