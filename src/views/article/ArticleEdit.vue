@@ -43,7 +43,6 @@
         <Vditor
           ref="vditor"
           v-model="article.originalContent"
-          @vditorMounted="setDefultArticle"
           @countWord="countWord"
         ></Vditor>
       </div>
@@ -311,16 +310,20 @@ export default {
     // get article from server
     setDefultArticle() {
       const articleID = this.$route.query.articleID;
-      if (!articleID) return;
+      if (!articleID) {
+          this.$refs.vditor.initViditor();
+          return;
+      }
       this.state = editMode.EDIT;
       this.$request
-        .get('article/' + articleID)
+        .get(`article/${articleID}`)
         .then((res) => {
           this.article = res.data;
+          this.$refs.vditor.initViditor();
         })
         .catch(() => {
           this.$message.warning('获取文章详情失败');
-        });
+        })
     },
     // get word count from sub component Vditor
     countWord(length) {
@@ -445,7 +448,6 @@ export default {
         })
         .catch(() => {
           this.$message.warning('创建分类失败');
-          // TODO: 换成修改按钮状态
         });
     },
     cancelCreateCategory() {
@@ -477,7 +479,6 @@ export default {
         .catch(() => {
           this.article.tags.splice(this.article.tags.indexOf(value), 1);
           this.$message.error('创建标签失败');
-          // TODO: 换成修改按钮状态
         });
     },
     createSEOKeyword(value) {
@@ -522,6 +523,7 @@ export default {
         });
       });
     });
+    this.setDefultArticle();
   },
 };
 </script>

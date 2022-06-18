@@ -20,10 +20,6 @@ export default {
     }
   },
   watch: {
-    // 当value时，更新vditor的Value
-    value(value) {
-      this.contentEditor.setValue(value);
-    },
     // 监听 store里面的数据
     isDark(isDark) {
       isDark
@@ -38,7 +34,7 @@ export default {
   },
   methods: {
     contentChange() {
-      this.$emit('change', this.contentEditor.getValue());
+      this.$emit('input', this.contentEditor.getValue());
     },
     countWord(length) {
       this.$emit('countWord', length);
@@ -47,6 +43,7 @@ export default {
       this.contentEditor.insertValue(content);
     },
     initViditor() {
+      const { isDark, value } = this;
       this.contentEditor = new Vditor('vditor', {
         height: 600,
         icon: 'material',
@@ -59,7 +56,7 @@ export default {
             this.countWord(length);
           },
         },
-        theme: this.isDark ? 'dark' : 'classic',
+        theme: isDark ? 'dark' : 'classic',
         preview: {
           delay: 50,
         },
@@ -69,15 +66,9 @@ export default {
         cache: {
           enable: false,
         },
-        after: () => {
-          // 由于存在异步请求与vditor的挂载先后顺序的问题，在vditor挂载完成之后再请求数据。
-          this.$emit('vditorMounted');
-        },
+        value,
       });
     },
-  },
-  mounted() {
-    this.initViditor();
   },
 };
 </script>
