@@ -18,7 +18,20 @@ export const vditorBaseConfigs = {
   cache: {
     enable: false,
   },
-}
+};
+
+export const skeletonRowCol = [
+  { width: '30%', },
+  1, 1,
+  { width: '30%' },
+  1, 1, 1,
+  { width: '80%' },
+  1,
+  { width: '60%' },
+  1, 1, 1, 1,
+  { width: '80%' },
+  { width: '10%' },
+]
 
 export const articleStatusMap = {
   0: {

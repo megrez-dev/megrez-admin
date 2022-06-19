@@ -1,12 +1,18 @@
 <template>
   <div id="vditor">
-    <t-skeleton style="padding: 20px;" loading animation="gradient" :delay="delayTime"> </t-skeleton>
+    <t-skeleton 
+      class="vditor-skeleton"
+      :rowCol="skeletonRowCol"
+      loading 
+      animation="gradient" 
+      :delay="delayTime"
+    ></t-skeleton>
   </div>
 </template>
 
 <script>
 import Vditor from 'vditor';
-import { vditorBaseConfigs } from '@/views/article/constants';
+import { vditorBaseConfigs, skeletonRowCol } from '@/views/article/constants';
 import 'vditor/dist/index.css';
 
 export default {
@@ -38,7 +44,8 @@ export default {
   data() {
     return {
       contentEditor: null,
-      delayTime: 500,
+      delayTime: 800,
+      skeletonRowCol: skeletonRowCol,
     };
   },
   methods: {
@@ -73,4 +80,9 @@ export default {
 };
 </script>
 
-<style lang="less" scoped></style>
+<style lang="less" scoped>
+.vditor-skeleton {
+  padding: 20px;
+  height: 600px;
+}
+</style>

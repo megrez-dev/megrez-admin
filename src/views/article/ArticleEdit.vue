@@ -56,7 +56,7 @@
         <t-tab-panel value="basic">
           <template #label> <icon name="setting" style="margin-right: 4px" /> 基本设置 </template>
           <t-form class="form-container" ref="form" labelAlign="top" colon>
-            <t-row :gutter="[20, 20]" align="middle">
+            <t-row :gutter="[50, 20]" align="middle" justify="center">
               <t-col :span="4">
                 <t-form-item
                   label="文章别名"
@@ -80,8 +80,8 @@
                 </t-form-item>
               </t-col>
             </t-row>
-            <t-divider></t-divider>
-            <t-row :gutter="[20, 20]">
+            <!-- <t-divider></t-divider> -->
+            <t-row :gutter="[50, 20]" justify="center">
               <t-col :span="4">
                 <t-form-item label="分类" name="categories">
                   <t-select
@@ -129,8 +129,8 @@
                 </t-form-item>
               </t-col>
             </t-row>
-            <t-divider></t-divider>
-            <t-row :gutter="[20, 20]">
+            <!-- <t-divider></t-divider> -->
+            <t-row :gutter="[50, 20]" justify="center">
               <t-col :span="4">
                 <t-form-item label="摘要" name="summary">
                   <t-textarea
@@ -149,10 +149,10 @@
                     v-model="article.cover"
                     placeholder="点击封面选择图片，或者输入外部链接"
                   ></t-input>
-                  <div class="article-cover">
-                    <img @click="openCoverSelectDrawer" :src="coverUrl"/>
-                  </div>
                 </t-form-item>
+                <div class="article-cover-img">
+                  <img @click="openCoverSelectDrawer" :src="coverUrl"/>
+                </div>
               </t-col>
             </t-row>
           </t-form>
@@ -160,7 +160,7 @@
         <t-tab-panel value="advanced">
           <template #label> <icon name="internet" style="margin-right: 4px" /> 高级设置 </template>
           <t-form class="form-container" ref="form" labelAlign="top" :colon="true">
-            <t-row :gutter="10">
+            <t-row :gutter="[50, 20]" justify="center">
               <t-col :span="3">
                 <t-form-item label="访问密码" name="password">
                   <t-input type="password" v-model="article.password" placeholder=""> </t-input>
@@ -540,6 +540,12 @@ export default {
   }
   .form-container {
     padding: 30px 30px;
+  }
+  .article-cover-img {
+    width: 100%;
+    img {
+      width: 100%;
+    }
   }
 }
 .article-edit-bar {
