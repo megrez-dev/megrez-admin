@@ -1,9 +1,12 @@
 <template>
-  <div id="vditor"></div>
+  <div id="vditor">
+    <t-skeleton style="padding: 20px;" loading animation="gradient" :delay="delayTime"> </t-skeleton>
+  </div>
 </template>
 
 <script>
 import Vditor from 'vditor';
+import { vditorBaseConfigs } from '@/views/article/constants';
 import 'vditor/dist/index.css';
 
 export default {
@@ -13,23 +16,29 @@ export default {
       require: false,
       default: '',
     },
-  },
+    loading: {
+      type: Boolean,
+      require: false,
+      default: true,
+    },
+  },  
   computed: {
     isDark() {
       return this.$store.state.app.isDark;
-    }
+    },
   },
   watch: {
     // 监听 store里面的数据
     isDark(isDark) {
       isDark
-        ? this.contentEditor.setTheme('dark', 'dark')
-        : this.contentEditor.setTheme('classic', 'light');
+        ? this.contentEditor?.setTheme('dark', 'dark')
+        : this.contentEditor?.setTheme('classic', 'light');
     },
   },
   data() {
     return {
       contentEditor: null,
+      delayTime: 500,
     };
   },
   methods: {
@@ -44,33 +53,24 @@ export default {
     },
     initViditor() {
       const { isDark, value } = this;
-      this.contentEditor = new Vditor('vditor', {
-        height: 600,
-        icon: 'material',
-        mode: 'wysiwyg',
-        input: this.contentChange,
-        counter: {
-          enable: true,
-          type: 'text',
-          after: (length) => {
-            this.countWord(length);
+      setTimeout(() => {
+        this.contentEditor = new Vditor('vditor', { 
+          ...vditorBaseConfigs, 
+          input: this.contentChange,
+          theme: isDark ? 'dark' : 'classic',
+          value,
+          counter: {
+            enable: true,
+            type: 'text',
+            after: (length) => {
+              this.countWord(length);
+            },
           },
-        },
-        theme: isDark ? 'dark' : 'classic',
-        preview: {
-          delay: 50,
-        },
-        outline: {
-          enable: true,
-        },
-        cache: {
-          enable: false,
-        },
-        value,
-      });
+        });
+      }, this.delayTime);
     },
   },
 };
 </script>
 
-<style></style>
+<style lang="less" scoped></style>
