@@ -19,3 +19,14 @@ export const vditorBaseConfigs = {
     enable: false,
   },
 }
+
+export const articleStatusMap = {
+  0: {
+    color: 'green',
+    text: '已发布',
+  },
+  1: {
+    color: 'orange',
+    text: '草稿',
+  },
+};
