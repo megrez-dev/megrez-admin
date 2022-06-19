@@ -77,7 +77,6 @@ export default {
 </script>
 
 <style lang="less" scoped>
-@import "@/style/variables";
 .login-card-container {
   box-shadow: -4px 7px 46px 2px rgb(0 0 0 / 10%);
   width: 320px;

@@ -529,10 +529,7 @@ export default {
 };
 </script>
 
-<style lang="less">
-@import '@/style/variables';
-@import '@/style/index';
-
+<style lang="less" scoped>
 .article-edit-container {
   .article-edit-title {
     margin-bottom: 20px;

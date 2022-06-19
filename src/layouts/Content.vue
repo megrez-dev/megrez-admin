@@ -18,8 +18,6 @@ export default {
 </script>
 
 <style lang="less" scoped>
-@import "@/style/variables";
-
 .fade-leave-active,
 .fade-enter-active {
   transition: opacity @anim-duration-slow @anim-time-fn-easing;

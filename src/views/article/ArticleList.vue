@@ -180,10 +180,7 @@ export default {
   },
 };
 </script>
-<style lang="less">
-@import '@/style/variables';
-@import '@/style/index';
-
+<style lang="less" scoped>
 .article-list {
   padding: 16px 24px;
   margin: 16px 0;

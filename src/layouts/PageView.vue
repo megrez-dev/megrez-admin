@@ -17,7 +17,6 @@ export default {
 };
 </script>
 <style lang="less" scoped>
-@import "@/style/variables";
 .content-wrapper {
   padding: 24px;
 }

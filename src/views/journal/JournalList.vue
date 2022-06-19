@@ -166,7 +166,6 @@ export default {
 };
 </script>
 <style lang="less">
-@import "@/style/variables";
 .t-list-item__content {
   width: 100%;
 }

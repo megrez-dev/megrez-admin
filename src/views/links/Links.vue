@@ -279,8 +279,6 @@ export default {
 </script>
 
 <style lang="less" scoped>
-@import "@/style/variables";
-@import "@/style/index";
 .logo-wrapper {
   width: 40px;
   height: 40px;

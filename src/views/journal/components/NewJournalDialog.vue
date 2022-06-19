@@ -127,7 +127,6 @@ export default {
 </script>
 
 <style lang="less" scpoed>
-@import "@/style/variables";
 .uploaded-files-container {
   display: flex;
   flex-wrap: wrap;

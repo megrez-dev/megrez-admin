@@ -177,7 +177,6 @@ export default {
 </script>
 
 <style lang="less" scoped>
-@import "@/style/variables";
 .install-card-container {
   box-shadow: rgb(99 99 99 / 20%) 0px 2px 8px 0px;
   width: 500px;

@@ -81,8 +81,6 @@ export default {
 };
 </script>
 <style lang="less">
-@import "@/style/variables.less";
-
 header {
   box-shadow: 0 1px 4px rgb(0 21 41 / 8%);
   z-index: 1;

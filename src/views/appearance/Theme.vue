@@ -181,7 +181,6 @@ export default {
 </script>
 
 <style lang="less" scoped>
-@import "@/style/variables";
 .page-header-bar {
   margin-bottom: 10px;
   display: flex;

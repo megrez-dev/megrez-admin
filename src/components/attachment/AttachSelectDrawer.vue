@@ -156,7 +156,6 @@ export default {
 </script>
 
 <style lang="less" scoped>
-@import "@/style/variables";
 .images-wrapper {
   display: flex;
   flex-wrap: wrap;
