@@ -4,28 +4,26 @@
       class="article-edit-bar"
       slot="header"
       justify="space-between"
-      align="middle"
+      align="bottom"
       :gutter="[0, 10]"
     >
-      <t-col flex="auto">
-        <h1>
-          {{ article.title === '' ? '新文章' : article.title }}
-        </h1>
+      <t-col flex="1 1 auto">
+        <h1>{{ article.title === '' ? '新文章' : article.title }}</h1>
+        <t-tag v-if="editMode === 1" :theme="article.status | statusTheme" variant="light">{{
+          article.status | statusText
+        }}</t-tag>
+        <span v-if="editMode === 1" class="last-edit-time"
+          >更新于 {{ article.editTime | timeAgo }}</span
+        >
       </t-col>
-      <t-col flex="auto">
+      <t-col flex="1 0 auto">
         <t-row justify="end">
-          <t-button
-            class="article-edit-bar-operator-item"
-            theme="warning"
-            variant="dashed"
-            @click="openAttachesSelectDrawer"
-          >
+          <t-button theme="warning" variant="dashed" @click="openAttachesSelectDrawer">
             附件
           </t-button>
           <t-button
-            class="article-edit-bar-operator-item"
             :loading="saving"
-            :disabled="publishing"
+            :disabled="publishing || !loaded"
             theme="danger"
             variant="base"
             @click="saveDraft"
@@ -33,11 +31,10 @@
             {{ article.status != 1 ? '存为草稿' : '保存草稿' }}
           </t-button>
           <t-button
-            class="article-edit-bar-operator-item"
             theme="primary"
             variant="base"
             :loading="publishing"
-            :disabled="saving"
+            :disabled="saving || !loaded"
             @click="handlePublish"
           >
             {{ editMode === 1 && article.status === 0 ? '更新' : '发布' }}
@@ -50,7 +47,7 @@
         <t-input size="large" placeholder="请输入标题" v-model="article.title" />
       </div>
       <div class="vditor-container">
-        <Vditor ref="vditor" v-model="article.originalContent" :loading="articleLoading" @countWord="countWord"></Vditor>
+        <Vditor ref="vditor" v-model="article.originalContent" @countWord="countWord"></Vditor>
       </div>
       <t-tabs defaultValue="basic">
         <t-tab-panel value="basic">
@@ -151,7 +148,7 @@
                   ></t-input>
                 </t-form-item>
                 <div class="article-cover-img">
-                  <img @click="openCoverSelectDrawer" :src="coverUrl"/>
+                  <img @click="openCoverSelectDrawer" :src="coverUrl" />
                 </div>
               </t-col>
             </t-row>
@@ -214,13 +211,14 @@ import AttachSelectDrawer from '@/components/attachment/AttachSelectDrawer.vue';
 import PageView from '@/layouts/PageView';
 import { Icon } from 'tdesign-icons-vue';
 import { editMode, defaultCoverUrl } from '@/views/article/constants';
+import { articleStatusMap } from '@/views/article/constants';
 
 export default {
   name: 'ArticleEdit',
   components: { Vditor, AttachSelectDrawer, Icon, PageView },
   data() {
     return {
-      articleLoading: true,
+      loaded: false,
       origin: location.origin,
       publishing: false, // 表示正在上传或正在更新
       saving: false, // 表示正在存草稿
@@ -240,7 +238,10 @@ export default {
         seoKeywords: [],
         seoDescription: '',
         status: 0,
+        editTime: '',
       },
+      preContent: ' ',
+      preTitle: '',
       categoryOptions: [],
       tagOptions: [],
       seoKeywordOptions: [],
@@ -271,6 +272,7 @@ export default {
   },
   methods: {
     initData() {
+      this.loaded = false; // 标志着vditor加载完成
       this.publishing = false;
       this.saving = false;
       this.article = {
@@ -289,8 +291,9 @@ export default {
         seoKeywords: [],
         seoDescription: '',
         status: 0,
+        editTime: '',
       };
-      this.categoryOptions = [];
+      (this.preContent = ' '), (this.preTitle = ''), (this.categoryOptions = []);
       this.tagOptions = [];
       this.seoKeywordOptions = [];
       this.showAddCategoryForm = false;
@@ -301,22 +304,29 @@ export default {
     },
     // get article from server
     setDefultArticle() {
-      this.articleLoading = true;
       if (!this.articleID) {
-        this.articleLoading = false;
         this.$nextTick(() => {
-          this.$refs.vditor.initViditor();
+          this.$refs.vditor.initViditor(() => {
+            // 为了防止在未加载完成之前点击保存、发布，导致浏览器报错
+            this.loaded = true;
+          });
         });
         return;
       }
+      // 根据articleId从后台获取初始化数据
       this.$request
         .get(`article/${this.articleID}`)
         .then((res) => {
           this.article = res.data;
-          this.articleLoading = false;
+          // 记录初始化的内容和标题。
+          this.preContent = res.data.originalContent;
+          this.preTitle = res.data.title;
           // 由于data的更新是异步的，所以需要在nextTick中执行，确保获取到最新的article
           this.$nextTick(() => {
-            this.$refs.vditor.initViditor();
+            this.$refs.vditor.initViditor(() => {
+              // 为了防止在未加载完成之前点击保存、发布，导致浏览器报错
+              this.loaded = true;
+            });
           });
         })
         .catch(() => {
@@ -345,7 +355,7 @@ export default {
           .then((res) => {
             if (res.status === 0) {
               this.$message.success('保存成功');
-              this.$router.push({ name: 'ArticleList' });
+              this.$router.push({ name: 'ArticleList', params: { hasSaved: true } });
             }
           })
           .catch(() => {
@@ -360,7 +370,7 @@ export default {
           .then((res) => {
             if (res.status === 0) {
               this.$message.success('保存成功');
-              this.$router.push({ name: 'ArticleList' });
+              this.$router.push({ name: 'ArticleList', params: { hasSaved: true } });
             }
           })
           .catch(() => {
@@ -387,7 +397,7 @@ export default {
           .then((res) => {
             if (res.status === 0) {
               this.$message.success('发布成功');
-              this.$router.push({ name: 'ArticleList' });
+              this.$router.push({ name: 'ArticleList', params: { hasSaved: true } });
             }
           })
           .catch(() => {
@@ -403,7 +413,7 @@ export default {
           .then((res) => {
             if (res.status === 0) {
               this.$message.success('更新成功');
-              this.$router.push({ name: 'ArticleList' });
+              this.$router.push({ name: 'ArticleList', params: { hasSaved: true } });
             }
           })
           .catch(() => {
@@ -502,6 +512,30 @@ export default {
     handleCoverSelect(attach) {
       this.article.cover = attach.url;
     },
+    handleRouteChange(to, from, next) {
+      // 如果标题和内容均没有发生变化，则认为没有发生变化，不进行提示
+      if (this.preContent === this.article.originalContent && this.preTitle === this.article.title)return next();
+      // 如果发生变化，则判断params中的hasSaved，若hasSaved为true则说明是点击保存或点击发布按钮后引起的路由跳转。
+      if (to.params.hasSaved) return next();
+      const dialog = this.$dialog({
+        header: '当前页面数据未保存，确定要离开吗？',
+        body: '如果离开当前页面，您的数据将会丢失！',
+        onConfirm() {
+          dialog.hide();
+          next();
+        },
+        theme: 'danger',
+      });
+    },
+  },
+
+  filters: {
+    statusTheme(status) {
+      return articleStatusMap[status].theme || 'danger';
+    },
+    statusText(status) {
+      return articleStatusMap[status].text || '未知';
+    },
   },
 
   mounted() {
@@ -526,14 +560,32 @@ export default {
     });
     this.setDefultArticle();
   },
+
+  beforeRouteUpdate(to, from, next) {
+    this.handleRouteChange(to, from, next);
+  },
+
+  beforeRouteLeave(to, from, next) {
+    this.handleRouteChange(to, from, next);
+  },
 };
 </script>
 
 <style lang="less" scoped>
+.article-edit-bar {
+  margin-bottom: 10px;
+  flex-wrap: nowrap;
+  .last-edit-time {
+    margin-left: 10px;
+    color: var(--td-text-color-placeholder);
+  }
+}
+
 .article-edit-container {
   .article-edit-title {
     margin-bottom: 20px;
   }
+
   .vditor-container {
     background-color: var(--td-bg-color-container);
     margin-bottom: 20px;
@@ -547,8 +599,5 @@ export default {
       width: 100%;
     }
   }
-}
-.article-edit-bar {
-  margin-bottom: 10px;
 }
 </style>

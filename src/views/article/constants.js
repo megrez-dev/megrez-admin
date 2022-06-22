@@ -37,9 +37,11 @@ export const articleStatusMap = {
   0: {
     color: 'green',
     text: '已发布',
+    theme: 'primary',
   },
   1: {
     color: 'orange',
     text: '草稿',
+    theme: 'warning',
   },
 };
