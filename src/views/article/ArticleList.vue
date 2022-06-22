@@ -7,7 +7,7 @@
       </t-button>
       <t-table
         class="article-list"
-        rowKey="property"
+        rowKey="id"
         verticalAlign="middle"
         :data="articleList"
         :columns="columns"
@@ -18,10 +18,10 @@
         <template #title="{ row }">
           <t-tooltip
             class="article-title-tooltips"
-            :content="row.title"
             theme="light"
             placement="mouse"
           >
+            <span slot="content"> {{ row.title }} <span style="color: rgba(0, 0, 0, .4)">更新于{{ row.editTime | timeAgo }}</span></span>
             <a class="t-button-link text-ellipsis" :href="'/article/' + row.id" target="_blank">
               {{ row.title }}
             </a>
@@ -91,14 +91,14 @@ export default {
       isArticleListLoading: false,
       deleting: false,
       columns: [
-        { colKey: 'title', title: '标题', width: 200 },
+        { colKey: 'title', title: '标题', width: 220 },
         { colKey: 'status', title: '状态', width: 100 },
         { colKey: 'categories', title: '分类' },
         { colKey: 'tags', title: '标签' },
         { colKey: 'commentsNum', title: '评论', width: 80, align: 'center' },
         { colKey: 'visits', title: '访问', width: 80, align: 'center' },
-        { colKey: 'publishTime', title: '发布时间', width: 120 },
-        { colKey: 'op', title: '操作', width: 180, fixed: 'right' },
+        { colKey: 'publishTime', title: '发布时间', width: 180 },
+        { colKey: 'op', title: '操作', width: 180, align: 'center', fixed: 'right' },
       ],
       pagination: {
         current: 1,
