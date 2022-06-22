@@ -11,9 +11,6 @@ import TDesign from 'tdesign-vue'
 import VueStorage from 'vue-ls'
 import VueViewer from 'v-viewer'
 
-import 'viewerjs/dist/viewer.css'
-import 'tdesign-vue/es/style/index.css';
-
 import { timeAgo } from '@/utils/datetime';
 
 Vue.config.productionTip = false
