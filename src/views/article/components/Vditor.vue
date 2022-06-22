@@ -1,11 +1,12 @@
 <template>
+  <!-- 不能用骨架屏包裹vditor，因为包裹之后vditor挂载时会找不到#vditor元素 -->
   <div id="vditor">
-    <t-skeleton 
+    <!-- 因此骨架屏单独写在此处，仅用于占位，当vditor挂在后会替换它，无需关心loading何时结束 -->
+    <t-skeleton
       class="vditor-skeleton"
       :rowCol="skeletonRowCol"
-      loading 
-      animation="gradient" 
-      :delay="delayTime"
+      loading
+      animation="gradient"
     ></t-skeleton>
   </div>
 </template>
@@ -22,12 +23,7 @@ export default {
       require: false,
       default: '',
     },
-    loading: {
-      type: Boolean,
-      require: false,
-      default: true,
-    },
-  },  
+  },
   computed: {
     isDark() {
       return this.$store.state.app.isDark;
@@ -44,7 +40,7 @@ export default {
   data() {
     return {
       contentEditor: null,
-      delayTime: 800,
+      delayTime: 500,
       skeletonRowCol: skeletonRowCol,
     };
   },
@@ -58,19 +54,27 @@ export default {
     append(content) {
       this.contentEditor.insertValue(content);
     },
-    initViditor() {
+    initViditor(cb) {
       const { isDark, value } = this;
+      const theme = isDark ? 'dark' : 'classic';
+      // 为了防止闪屏抖动，延迟500ms挂载vditor
       setTimeout(() => {
-        this.contentEditor = new Vditor('vditor', { 
-          ...vditorBaseConfigs, 
+        this.contentEditor = new Vditor('vditor', {
+          ...vditorBaseConfigs,
           input: this.contentChange,
-          theme: isDark ? 'dark' : 'classic',
+          theme,
+          preview: {
+            theme: {
+              current: theme
+            }
+          },
           value,
           counter: {
             enable: true,
             type: 'text',
             after: (length) => {
               this.countWord(length);
+              cb();
             },
           },
         });
