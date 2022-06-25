@@ -3,7 +3,12 @@ const path = require('path');
 module.exports = {
     devServer: {
         host: '0.0.0.0',
-        port: 5000
+        port: 5000,
+        proxy: {
+          '/upload': {
+            target: 'http://localhost:8080/'
+          }
+        }
     },
 
     publicPath: process.env.NODE_ENV === 'production' ? '/admin/' : '/',
