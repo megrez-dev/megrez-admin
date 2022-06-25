@@ -3,7 +3,7 @@
     <template #logo>
       <div class="header-operator-left">
         <t-button shape="square" variant="text" @click="toggleCollapsed">
-          <t-icon class="collapsed-icon" :name="collapsIcon" />
+          <t-icon size="20px" class="collapsed-icon" :name="collapsIcon" />
         </t-button>
       </div>
     </template>
@@ -11,12 +11,12 @@
       <div class="header-operator-right">
         <t-tooltip placement="bottom" content="代码仓库">
           <t-button shape="square" variant="text">
-            <t-icon name="logo-github" />
+            <t-icon size="20px" name="logo-github" />
           </t-button>
         </t-tooltip>
         <t-tooltip placement="bottom" content="帮助文档">
           <t-button shape="square" variant="text">
-            <t-icon name="help-circle" />
+            <t-icon size="20px" name="help-circle" />
           </t-button>
         </t-tooltip>
         <div class="theme-tab">
@@ -27,10 +27,10 @@
             @change="toggleTheme"
           >
             <t-radio-button value="light"
-              ><icon name="heart-filled" style="color: orange"
+              ><icon name="heart-filled" size="20px" style="color: orange"
             /></t-radio-button>
             <t-radio-button value="dark"
-              ><icon name="star-filled" style="color: gray"
+              ><icon name="star-filled" size="20px" style="color: gray"
             /></t-radio-button>
           </t-radio-group>
         </div>
@@ -94,13 +94,6 @@ header {
 
   .collapsed-icon {
     font-size: 20px;
-  }
-}
-
-.t-icon {
-  font-size: 20px !important;
-  &.general {
-    margin-right: 16px;
   }
 }
 

@@ -1,19 +1,20 @@
-import Vue from 'vue'
+import Vue from 'vue';
 import VueRouter from 'vue-router';
-import App from './App.vue'
-import router from './router'
-import store from './store'
-import StorageConfig from '@/config/storage'
-import axiosInstance from '@/utils/request'
+import App from './App.vue';
+import router from './router';
+import store from './store';
+import StorageConfig from '@/config/storage';
+import axiosInstance from '@/utils/request';
 
-import VueClipboard from 'vue-clipboard2'
-import TDesign from 'tdesign-vue'
-import VueStorage from 'vue-ls'
-import VueViewer from 'v-viewer'
-
+import VueClipboard from 'vue-clipboard2';
+import TDesign from 'tdesign-vue';
+import VueStorage from 'vue-ls';
+import VueViewer from 'v-viewer';
 import { timeAgo } from '@/utils/datetime';
 
-Vue.config.productionTip = false
+import 'viewerjs/dist/viewer.css';
+
+Vue.config.productionTip = false;
 
 Vue.filter('timeAgo', timeAgo);
 Vue.use(VueRouter);
@@ -22,14 +23,14 @@ Vue.use(VueStorage, StorageConfig);
 Vue.use(VueClipboard);
 Vue.use(VueViewer, {
   defaultOptions: {
-    zIndex: 9999
-  }
+    zIndex: 9999,
+  },
 });
 
-Vue.prototype.$request = axiosInstance
+Vue.prototype.$request = axiosInstance;
 
 new Vue({
   router,
   store,
-  render: h => h(App),
-}).$mount('#app')
+  render: (h) => h(App),
+}).$mount('#app');

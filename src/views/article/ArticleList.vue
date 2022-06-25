@@ -61,14 +61,14 @@
         </template>
         <template #op="{ row: { id } }">
           <t-button variant="text" size="small" @click="handleClickDetail(id)">
-            <EditIcon />
+            <EditIcon size="18px" />
           </t-button>
           <t-button variant="text" size="small" @click="handleSetting(id)">
-            <SettingIcon />
+            <SettingIcon size="18px" />
           </t-button>
           <t-popconfirm @confirm="handleClickDelete(id)" content="确认删除？" theme="danger">
             <t-button variant="text" theme="danger" size="small" :loading="deleting">
-              <DeleteIcon v-show="!deleting"/>
+              <DeleteIcon size="18px" v-show="!deleting"/>
             </t-button>
           </t-popconfirm>
         </template>
