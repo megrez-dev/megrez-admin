@@ -53,8 +53,8 @@
         <t-tab-panel value="basic">
           <template #label> <icon name="setting" style="margin-right: 4px" /> 基本设置 </template>
           <t-form class="form-container" ref="form" labelAlign="top" colon>
-            <t-row :gutter="[50, 20]" align="middle" justify="center">
-              <t-col :lg="4" :span="6">
+            <t-row :gutter="[50, 20]" justify="center">
+              <t-col :xl="4" :span="6">
                 <t-form-item
                   label="文章别名"
                   name="slug"
@@ -65,20 +65,6 @@
                     placeholder="不填写则会默认使用标题拼音或文章id"
                   ></t-input>
                 </t-form-item>
-              </t-col>
-              <t-col :lg="2" :span="3">
-                <t-form-item label="开启评论" name="allowedComment" labelAlign="left">
-                  <t-switch v-model="article.allowedComment"></t-switch>
-                </t-form-item>
-              </t-col>
-              <t-col :lg="2" :span="3">
-                <t-form-item label="是否置顶" name="isTop" labelAlign="left">
-                  <t-switch v-model="article.isTop"></t-switch>
-                </t-form-item>
-              </t-col>
-            </t-row>
-            <t-row :gutter="[50, 20]" justify="center">
-              <t-col :lg="4" :span="6">
                 <t-form-item label="分类" name="categories">
                   <t-select
                     v-model="article.categories"
@@ -110,8 +96,6 @@
                     </t-form-item>
                   </t-form>
                 </t-dialog>
-              </t-col>
-              <t-col :lg="4" :span="6">
                 <t-form-item label="标签" name="tags">
                   <t-select
                     v-model="article.tags"
@@ -123,21 +107,29 @@
                     @create="handleCreateTag"
                   />
                 </t-form-item>
-              </t-col>
-            </t-row>
-            <!-- <t-divider></t-divider> -->
-            <t-row :gutter="[50, 20]" justify="center">
-              <t-col :lg="4" :span="6">
                 <t-form-item label="摘要" name="summary">
                   <t-textarea
                     v-model="article.summary"
                     placeholder="若不填写，将会从文章中自动截取"
                     name="summary"
-                    :autosize="{ minRows: 12}"
+                    :autosize="{ minRows: 6 }"
                   />
                 </t-form-item>
               </t-col>
-              <t-col :lg="4" :span="6">
+              <t-col :xl="4" :span="6">
+                <!-- 添加padding使其对齐左边的输入框 -->
+                <t-row style="padding: 32px 0 24px 0;">
+                  <t-col :span="6">
+                    <t-form-item label="开启评论" name="allowedComment" labelAlign="left">
+                      <t-switch v-model="article.allowedComment"></t-switch>
+                    </t-form-item>
+                  </t-col>
+                  <t-col :span="6">
+                    <t-form-item label="是否置顶" name="isTop" labelAlign="left">
+                      <t-switch v-model="article.isTop"></t-switch>
+                    </t-form-item>
+                  </t-col>
+                </t-row>
                 <t-form-item label="封面图" name="cover">
                   <t-input
                     clearable
@@ -147,8 +139,12 @@
                   ></t-input>
                 </t-form-item>
                 <div class="article-cover-img">
-                  <m-image @maskClick="openCoverSelectDrawer" :src="coverUrl" fit="cover" :preview="false"></m-image>
-                  <!-- <img @click="openCoverSelectDrawer" :src="coverUrl" /> -->
+                  <m-image
+                    @maskClick="openCoverSelectDrawer"
+                    :src="coverUrl"
+                    fit="cover"
+                    :preview="false"
+                  ></m-image>
                 </div>
               </t-col>
             </t-row>
@@ -158,12 +154,12 @@
           <template #label> <icon name="internet" style="margin-right: 4px" /> 高级设置 </template>
           <t-form class="form-container" ref="form" labelAlign="top" :colon="true">
             <t-row :gutter="[50, 20]" justify="center">
-              <t-col :lg="3" :span="4">
+              <t-col :xl="2" :span="4">
                 <t-form-item label="访问密码" name="password">
                   <t-input type="password" v-model="article.password" placeholder=""> </t-input>
                 </t-form-item>
               </t-col>
-              <t-col :lg="6" :span="8">
+              <t-col :xl="5" :span="8">
                 <t-form-item label="SEO 关键字" name="keywords">
                   <t-select
                     v-model="article.seoKeywords"
@@ -177,7 +173,7 @@
                   />
                 </t-form-item>
               </t-col>
-              <t-col :lg="9" :span="12">
+              <t-col :xl="7" :span="12">
                 <t-form-item label="SEO 描述" name="description">
                   <t-textarea
                     v-model="article.seoDescription"
@@ -302,7 +298,9 @@ export default {
         status: 0,
         editTime: '',
       };
-      (this.preContent = ' '), (this.preTitle = ''), (this.categoryOptions = []);
+      this.preContent = ' ';
+      this.preTitle = '';
+      this.categoryOptions = [];
       this.tagOptions = [];
       this.seoKeywordOptions = [];
       this.showAddCategoryForm = false;
@@ -530,7 +528,8 @@ export default {
     // TODO: 还需要监听浏览器窗口的关闭和刷新
     handleRouteChange(to, from, next) {
       // 如果标题和内容均没有发生变化，则认为没有发生变化，不进行提示
-      if (this.preContent === this.article.originalContent && this.preTitle === this.article.title) return next();
+      if (this.preContent === this.article.originalContent && this.preTitle === this.article.title)
+        return next();
       // 如果发生变化，则判断params中的hasSaved，若hasSaved为true则说明是点击保存或点击发布按钮后引起的路由跳转。
       if (to.params.hasSaved) return next();
       const dialog = this.$dialog({
@@ -611,7 +610,7 @@ export default {
   }
   .article-cover-img {
     width: 100%;
-    height: 220px;
+    height: 265px;
     cursor: pointer;
   }
 }
