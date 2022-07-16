@@ -48,7 +48,10 @@ export default {
     alt: String,
     fit: String,
     fallback: String,
-    preview: Boolean || String,
+    preview: {
+      type: [ Boolean, String ],
+      default: true,
+    },
     // 用于配置v-viewer
     viewerOptions: {
       type: Object,

@@ -122,7 +122,7 @@ export default {
             this.$set(
               this.maskVisible,
               index,
-              this.journalList[index].images.map(() => false)
+              this.journalList[index].images?.map(() => false)
             );
           }
         })

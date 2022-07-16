@@ -37,7 +37,9 @@
           上传附件
         </t-button>
         <span class="complete-button" v-if="mode === 'multiple'">
-          <t-button theme="danger" :disabled="selectedNum <= 0" @click="onClickComplete">完成</t-button>
+          <t-button theme="danger" :disabled="selectedNum <= 0" @click="onClickComplete">
+            完成{{ maxNum > 0 ? `(${selectedNum}/${maxNum})` : ''}}
+          </t-button>
         </span>
       </template>
     </t-drawer>
@@ -84,7 +86,10 @@ export default {
       required: false,
       default: false,
     },
-    maxNum: Number,
+    maxNum: {
+      type: [Number, String],
+      default: 0,
+    },
   },
   watch: {
     visible(newVal) {
@@ -135,15 +140,16 @@ export default {
     },
     handleSelect(attach) {
       if (attach.selected) return;
+      const maxNum = Number(this.maxNum);
+      if (maxNum != 0 && maxNum <= this.selectedNum) {
+        this.$message.warning('最多只能选择' + maxNum + '个附件');
+        return;
+      }
       attach.selected = true;
       this.selectedNum++;
       if (this.mode === 'single') {
         this.$emit('select', attach);
         this.close();
-        return;
-      }
-      if (this.maxNum != 0 && this.maxNum <= this.selectedNum) {
-        this.$message.warning('最多只能选择' + this.maxNum + '个附件');
         return;
       }
     },
@@ -152,7 +158,10 @@ export default {
       attach.selected = false;
     },
     onClickComplete() {
-      this.$emit('select', this.attachments.filter((item) => item.selected));
+      this.$emit(
+        'select',
+        this.attachments.filter((item) => item.selected)
+      );
       this.close();
     },
   },
