@@ -1,86 +1,92 @@
 <template>
-  <div id="vditor"></div>
+  <!-- 不能用骨架屏包裹vditor，因为包裹之后vditor挂载时会找不到#vditor元素 -->
+  <div id="vditor">
+    <!-- 因此骨架屏单独写在此处，仅用于占位，当vditor挂在后会替换它，无需关心loading何时结束 -->
+    <t-skeleton
+      class="vditor-skeleton"
+      :rowCol="skeletonRowCol"
+      loading
+      animation="gradient"
+    ></t-skeleton>
+  </div>
 </template>
 
 <script>
-import Vditor from "vditor";
-import "vditor/dist/index.css";
+import Vditor from 'vditor';
+import { vditorBaseConfigs, skeletonRowCol } from '@/views/article/constants';
+import 'vditor/dist/index.css';
 
 export default {
+  props: {
+    value: {
+      type: String,
+      require: false,
+      default: '',
+    },
+  },
+  computed: {
+    isDark() {
+      return this.$store.state.app.isDark;
+    },
+  },
+  watch: {
+    // 监听 store里面的数据
+    isDark(isDark) {
+      isDark
+        ? this.contentEditor?.setTheme('dark', 'dark')
+        : this.contentEditor?.setTheme('classic', 'light');
+    },
+  },
   data() {
     return {
       contentEditor: null,
+      delayTime: 500,
+      skeletonRowCol: skeletonRowCol,
     };
-  },
-  props: {
-    originalContent: {
-      type: String,
-      required: false,
-      default: "",
-    },
   },
   methods: {
     contentChange() {
-      this.$emit(
-        "contentChange",
-        this.contentEditor.getValue(),
-        this.contentEditor.getHTML()
-      );
+      this.$emit('input', this.contentEditor.getValue());
     },
     countWord(length) {
-      this.$emit("countWord", length);
+      this.$emit('countWord', length);
     },
     append(content) {
       this.contentEditor.insertValue(content);
     },
-  },
-  mounted() {
-    this.contentEditor = new Vditor("vditor", {
-      height: 600,
-      icon: "material",
-      mode: "wysiwyg",
-      input: this.contentChange,
-      counter: {
-        enable: true,
-        type: "text",
-        after: (length) => {
-          this.countWord(length);
-        },
-      },
-      preview: {
-        delay: 50,
-      },
-      outline: {
-        enable: true,
-      },
-      cache: {
-        enable: false,
-      },
-      after: () => {
-        if (this.$store.state.app.isDark) {
-          this.contentEditor.setTheme("dark", "dark");
-        } else {
-          this.contentEditor.setTheme("classic", "light");
-        }
-        this.contentEditor.setValue(this.originalContent);
-      },
-    });
-  },
-  watch: {
-    // 监听 store里面的数据
-    "$store.state.app.isDark": {
-      deep: true,
-      handler: function (newValue) {
-        // result为true，则表示是全部选中
-        if (newValue) {
-          this.contentEditor.setTheme("dark", "dark");
-        } else {
-          this.contentEditor.setTheme("classic", "light");
-        }
-      },
+    initViditor(cb) {
+      const { isDark, value } = this;
+      const theme = isDark ? 'dark' : 'classic';
+      // 为了防止闪屏抖动，延迟500ms挂载vditor
+      setTimeout(() => {
+        this.contentEditor = new Vditor('vditor', {
+          ...vditorBaseConfigs,
+          input: this.contentChange,
+          theme,
+          preview: {
+            theme: {
+              current: theme
+            }
+          },
+          value,
+          counter: {
+            enable: true,
+            type: 'text',
+            after: (length) => {
+              this.countWord(length);
+              cb();
+            },
+          },
+        });
+      }, this.delayTime);
     },
   },
 };
 </script>
 
-<style></style>
+<style lang="less" scoped>
+.vditor-skeleton {
+  padding: 20px;
+  height: 600px;
+}
+</style>

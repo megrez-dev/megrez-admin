@@ -16,25 +16,10 @@
       ></t-textarea>
       <t-divider dashed></t-divider>
       <div class="uploaded-files-container">
-        <div
-          class="uploaded-files-item"
-          v-for="(image, index) in journal.images"
-          :key="image.name"
-          @mouseenter="mouseEnter(image, index)"
-          @mouseleave="mouseLeave(image, index)"
-        >
-          <img :src="image" />
-          <div class="uploaded-files-mask" v-show="maskVisible[index]">
-            <BrowseIcon style="cursor: pointer" @click="handlePreview(index)" />
-            <t-divider layout="vertical" />
-            <DeleteIcon style="cursor: pointer" @click="handleDelete(index)" />
-          </div>
+        <div class="uploaded-files-item" v-for="image in journal.images" :key="image">
+          <m-image fit="cover" :src="image"></m-image>
         </div>
-        <div
-          class="new-upload-box"
-          @click="openAttachSelectDrawer"
-          v-if="journal.images.length < 9"
-        >
+        <div class="new-upload-box" @click="drawerVisible = true" v-if="journal.images.length < 9">
           <div class="new-upload-box-icon"><AddIcon /></div>
           <div class="new-upload-box-text">选择附件</div>
         </div>
@@ -43,26 +28,40 @@
     <AttachSelectDrawer
       ref="attachSelectDrawer"
       mode="multiple"
+      maxNum="9"
+      :visible.sync="drawerVisible"
       @select="selectAttaches"
     ></AttachSelectDrawer>
   </div>
 </template>
 
 <script>
-import AttachSelectDrawer from "@/components/attachment/AttachSelectDrawer.vue";
-import { BrowseIcon, DeleteIcon, AddIcon } from "tdesign-icons-vue";
+import AttachSelectDrawer from '@/components/attachment/AttachSelectDrawer.vue';
+import { AddIcon } from 'tdesign-icons-vue';
+// import { BrowseIcon, DeleteIcon, AddIcon } from 'tdesign-icons-vue';
+import MImage from '@/components/image/Image.vue';
+
 export default {
-  name: "NewJournalDialog",
+  name: 'NewJournalDialog',
+  components: {
+    AttachSelectDrawer,
+    MImage,
+    // BrowseIcon,
+    // DeleteIcon,
+    AddIcon,
+  },
   data() {
     return {
       visible: false,
+      // attachesDrawerVisible: false,
+      drawerVisible: false,
       journal: {
-        content: "",
+        content: '',
         private: false,
         status: 0,
         images: [],
       },
-      maskVisible: [],
+      // maskVisible: [],
     };
   },
   methods: {
@@ -73,28 +72,28 @@ export default {
       this.visible = false;
     },
     publishJournal() {
-      if (this.journal.content === "" && this.journal.images.length === 0) {
-        this.$message.warning("请填写内容或者上传图片");
+      if (this.journal.content === '' && this.journal.images.length === 0) {
+        this.$message.warning('请填写内容或者上传图片');
         return;
       }
       this.$request
-        .post("/journal", this.journal)
+        .post('/journal', this.journal)
         .then(() => {
-          this.$message.success("发布成功");
+          this.$message.success('发布成功');
           this.close();
-          this.journal.content = "";
+          this.journal.content = '';
           this.journal.images = [];
         })
         .catch(() => {
-          this.$message.error("发布失败");
+          this.$message.error('发布失败');
         });
     },
-    mouseEnter(image, index) {
-      this.$set(this.maskVisible, index, true);
-    },
-    mouseLeave(image, index) {
-      this.$set(this.maskVisible, index, false);
-    },
+    // mouseEnter(image, index) {
+    //   this.$set(this.maskVisible, index, true);
+    // },
+    // mouseLeave(image, index) {
+    //   this.$set(this.maskVisible, index, false);
+    // },
     handlePreview(index) {
       this.$viewerApi({
         options: {
@@ -105,29 +104,21 @@ export default {
     },
     handleDelete(index) {
       this.journal.images.splice(index, 1);
-      this.maskVisible.splice(index, 1);
+      // this.maskVisible.splice(index, 1);
     },
     selectAttaches(attaches) {
-      this.journal.images = this.journal.images.concat(
-        attaches.map((attach) => attach.url)
-      );
-      this.maskVisible = this.journal.images.map(() => false);
+      this.journal.images = this.journal.images.concat(attaches.map((attach) => attach.url));
+      // this.maskVisible = this.journal.images.map(() => false);
     },
     openAttachSelectDrawer() {
-      this.$refs.attachSelectDrawer.open(9 - this.journal.images.length);
+      this.drawerVisible = true;
+      // this.$refs.attachSelectDrawer.open(9 - this.journal.images.length);
     },
-  },
-  components: {
-    AttachSelectDrawer,
-    BrowseIcon,
-    DeleteIcon,
-    AddIcon,
   },
 };
 </script>
 
 <style lang="less" scpoed>
-@import "@/style/variables";
 .uploaded-files-container {
   display: flex;
   flex-wrap: wrap;

@@ -10,26 +10,25 @@
       :onOverlayClick="close"
       placement="right"
     >
+      <t-row :gutter="[10, 10]">
+        <t-col>
+          <t-input v-model="keywords" placeholder="通过关键词搜索"></t-input>
+        </t-col>
+      </t-row>
       <div class="images-wrapper">
-        <div
-          class="image-item"
-          :style="selectedIndex[index] ? { border: '5px solid #1890ff' } : {}"
-          v-for="(attach, index) in attachments"
-          :key="attach.id"
-          @click="handleSelect(attach, index)"
-          @mouseenter="mouseEnter(index)"
-          @mouseleave="mouseLeave(index)"
-        >
-          <img :src="attach.url" />
-          <div class="image-item-mask" v-show="maskVisible[index]">
-            <div @click.stop="handlePreview(attach)">
-              <BrowseIcon style="cursor: pointer" />
-            </div>
-            <t-divider layout="vertical" />
-            <div @click.stop="handleDetail(attach)">
-              <InfoCircleIcon style="cursor: pointer" />
-            </div>
-          </div>
+        <div class="image-item" v-for="(attach, index) in attachments" :key="attach.id">
+          <div class="select-mask" v-show="attach.selected" @click="unSelect(attach, index)"></div>
+          <m-image fit="cover" :src="attach.url" @maskClick="handleSelect(attach, index)">
+            <template slot="maskInner">
+              <span style="cursor: pointer" @click.stop="previewImage(attach.url)">
+                <BrowseIcon size="1.1em" /> 预览
+              </span>
+              <t-divider layout="vertical"></t-divider>
+              <span style="cursor: pointer" @click.stop="previewAttach(attach)">
+                <InfoCircleIcon size="1.1em" /> 详情
+              </span>
+            </template>
+          </m-image>
         </div>
       </div>
       <template #footer>
@@ -38,38 +37,40 @@
           上传附件
         </t-button>
         <span class="complete-button" v-if="mode === 'multiple'">
-          <t-button
-            theme="danger"
-            @click="onClickComplete"
-            v-if="selectedAttaches.length > 0"
-          >
-            完成
+          <t-button theme="danger" :disabled="selectedNum <= 0" @click="onClickComplete">
+            完成{{ maxNum > 0 ? `(${selectedNum}/${maxNum})` : ''}}
           </t-button>
-          <t-button theme="danger" v-else disabled>完成</t-button>
         </span>
       </template>
     </t-drawer>
     <AttachDetailDrawer ref="attachDetailDrawer"></AttachDetailDrawer>
-    <AttachUploadDialog
-      ref="attachUploadDialog"
-      @uploadSuccess="syncData"
-    ></AttachUploadDialog>
+    <AttachUploadDialog ref="attachUploadDialog" @uploadSuccess="syncData"></AttachUploadDialog>
   </div>
 </template>
 
 <script>
-import AttachUploadDialog from "@/components/attachment/AttachUploadDialog.vue";
-import AttachDetailDrawer from "@/components/attachment/AttachDetailDrawer.vue";
-import { InfoCircleIcon, BrowseIcon, UploadIcon } from "tdesign-icons-vue";
+import AttachUploadDialog from '@/components/attachment/AttachUploadDialog.vue';
+import AttachDetailDrawer from '@/components/attachment/AttachDetailDrawer.vue';
+import MImage from '@/components/image/Image.vue';
+import { viewerOptions } from '@/components/image/constants';
+import { UploadIcon, BrowseIcon, InfoCircleIcon } from 'tdesign-icons-vue';
+
 export default {
-  name: "AttachSelectDrawer",
+  name: 'AttachSelectDrawer',
+  components: {
+    AttachUploadDialog,
+    AttachDetailDrawer,
+    MImage,
+    UploadIcon,
+    BrowseIcon,
+    InfoCircleIcon,
+  },
   data() {
     return {
-      num: 0,
-      visible: false,
+      hasInit: false,
+      keywords: '',
       attachments: [],
-      maskVisible: [],
-      selectedIndex: [],
+      selectedNum: 0,
       selectedAttaches: [],
     };
   },
@@ -77,125 +78,118 @@ export default {
     mode: {
       type: String,
       required: false,
-      default: "single",
+      default: 'single',
+    },
+    // AttachSelectDrawer现在为受控组件，是否展示受控于父组件传递的visible属性
+    visible: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    maxNum: {
+      type: [Number, String],
+      default: 0,
+    },
+  },
+  watch: {
+    visible(newVal) {
+      if (newVal) {
+        this.$emit('open');
+        // 若未初始化，则请求数据，进行数据的初始化
+        if (this.hasInit) return;
+        this.hasInit = true;
+        this.syncData();
+      } else {
+        this.$emit('close');
+      }
     },
   },
   methods: {
-    open(num = 0) {
-      this.num = num;
-      this.visible = true;
-    },
     close() {
-      this.visible = false;
-      this.selectedIndex = this.selectedIndex.map(() => false);
-      this.selectedAttaches = [];
+      // 同步更新visible值，需要父组件传参时添加.sync修饰符
+      this.$emit('update:visible', false);
+      this.$emit('close');
+      this.selectedIndex = [];
+      this.selectedAttaches = new Set();
     },
     onClickUpload() {
       this.$refs.attachUploadDialog.open();
     },
     syncData() {
       this.$request
-        .get("attachments")
+        .get('attachments')
         .then((res) => {
           if (res.status === 0) {
-            this.attachments = res.data.list ? res.data.list : [];
+            this.attachments = res.data.list
+              ? res.data.list.map((item) => ({ ...item, selected: false }))
+              : [];
           }
-          this.maskVisible = this.attachments.map(() => false);
-          this.selectedIndex = this.attachments.map(() => false);
         })
         .catch(() => {
-          this.$message.error("获取附件列表失败");
+          this.$message.error('获取附件列表失败');
         });
     },
-    mouseEnter(index) {
-      this.$set(this.maskVisible, index, true);
-    },
-    mouseLeave(index) {
-      this.$set(this.maskVisible, index, false);
-    },
-    handleDetail(attach) {
+    previewAttach(attach) {
       this.$refs.attachDetailDrawer.open(attach);
     },
-    handlePreview(attach) {
+    previewImage(url) {
       this.$viewerApi({
-        images: [attach.url],
+        images: [url],
+        options: viewerOptions,
       });
     },
-    handleSelect(attach, index) {
-      if (this.mode === "single") {
-        this.$emit("select", attach);
-        this.close();
-      }
-      if (this.num != 0 && this.num <= this.selectedAttaches.length) {
-        this.$message.warning("最多只能选择" + this.num + "个附件");
+    handleSelect(attach) {
+      if (attach.selected) return;
+      const maxNum = Number(this.maxNum);
+      if (maxNum != 0 && maxNum <= this.selectedNum) {
+        this.$message.warning('最多只能选择' + maxNum + '个附件');
         return;
       }
-      this.$set(this.selectedIndex, index, !this.selectedIndex[index]);
-      if (this.selectedIndex[index]) {
-        this.selectedAttaches.push(attach);
-      } else {
-        this.selectedAttaches.splice(this.selectedAttaches.indexOf(attach), 1);
+      attach.selected = true;
+      this.selectedNum++;
+      if (this.mode === 'single') {
+        this.$emit('select', attach);
+        this.close();
+        return;
       }
     },
+    unSelect(attach) {
+      this.selectedNum--;
+      attach.selected = false;
+    },
     onClickComplete() {
-      this.$emit("select", this.selectedAttaches);
+      this.$emit(
+        'select',
+        this.attachments.filter((item) => item.selected)
+      );
       this.close();
     },
-  },
-  mounted() {
-    this.syncData();
-  },
-  components: {
-    AttachUploadDialog,
-    AttachDetailDrawer,
-    InfoCircleIcon,
-    BrowseIcon,
-    UploadIcon,
   },
 };
 </script>
 
 <style lang="less" scoped>
-@import "@/style/variables";
 .images-wrapper {
+  position: relative;
   display: flex;
   flex-wrap: wrap;
+  .select-mask {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.2);
+    border: 3px solid @brand-color-5;
+    z-index: 300;
+  }
   .image-item {
-    background-color: @bg-color-secondarycontainer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     position: relative;
-    width: 160px;
-    height: 160px;
-    margin: 0 10px 20px 10px;
-    border: 1px solid @border-level-2-color;
-    img {
-      max-width: 100%;
-      max-height: 100%;
-      margin: auto;
-    }
-    .image-item-mask {
-      background-color: @text-color-secondary;
-      color: @bg-color-container;
-      transition: all 0.2s linear;
-      will-change: transform;
-      opacity: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: absolute;
-      left: 0;
-      right: 0;
-      top: 0;
-      bottom: 0;
-      &:hover {
-        opacity: 1;
-      }
-    }
+    flex: 1 1 160px;
+    height: 170px;
+    margin: 10px 5px;
+    overflow: hidden;
+    background-color: @bg-color-secondarycontainer;
   }
 }
-
 .complete-button {
   float: right;
 }

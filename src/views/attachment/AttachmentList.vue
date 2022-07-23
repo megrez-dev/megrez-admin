@@ -107,8 +107,6 @@ export default {
 </script>
 
 <style lang="less" scoped>
-@import "@/style/variables";
-@import "@/style/index";
 .links-container {
   .card-container {
     padding: 0 0 24px 0;

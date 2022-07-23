@@ -196,6 +196,7 @@ export default {
             },
           })
           .then((res) => {
+            this.isLoading = false;
             this.links = res.data.list;
             this.pagination = {
               ...pagination,
@@ -205,7 +206,6 @@ export default {
       } catch (err) {
         this.links = [];
       }
-      this.isLoading = false;
     },
     // 也可以使用 page-change 事件
     async rehandleChange(changeParams) {
@@ -279,8 +279,6 @@ export default {
 </script>
 
 <style lang="less" scoped>
-@import "@/style/variables";
-@import "@/style/index";
 .logo-wrapper {
   width: 40px;
   height: 40px;
