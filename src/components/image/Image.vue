@@ -8,7 +8,6 @@
     <div class="megrez-image-loading" v-if="loading"><LoadingIcon /></div>
     <img
       class="megrez-image-img"
-      v-bind="$attrs"
       :src="error ? fallbackSrc : src"
       :alt="alt"
       :style="imageStyle"
@@ -178,8 +177,8 @@ export default {
     position: absolute;
     width: 100%;
     height: 100%;
-    color: @bg-color-container;
-    background-color: rgba(0, 0, 0, 0.3);
+    color: @text-color-anti;
+    background-color: @mask-active;
     opacity: 0;
     z-index: 200;
     transition: all 0.2s;
