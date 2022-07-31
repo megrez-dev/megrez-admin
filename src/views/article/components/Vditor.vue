@@ -4,16 +4,17 @@
     <!-- 因此骨架屏单独写在此处，仅用于占位，当vditor挂在后会替换它，无需关心loading何时结束 -->
     <t-skeleton
       class="vditor-skeleton"
-      :rowCol="skeletonRowCol"
-      loading
       animation="gradient"
+      :loading="loading"
+      :rowCol="skeletonRowCol"
+      :delay="delayTime"
     ></t-skeleton>
   </div>
 </template>
 
 <script>
 import Vditor from 'vditor';
-import { vditorBaseConfigs, skeletonRowCol } from '@/views/article/constants';
+import { VDITOR_BASE_CONFIGS, SKELETON_ROW_COL, THEME_SETTING, VDITOR_TOOLBAR, UPLOAD_BASE_CONFIGS } from '@/views/article/constants';
 import 'vditor/dist/index.css';
 
 export default {
@@ -23,6 +24,7 @@ export default {
       require: false,
       default: '',
     },
+    loading: Boolean,
   },
   computed: {
     isDark() {
@@ -32,16 +34,17 @@ export default {
   watch: {
     // 监听 store里面的数据
     isDark(isDark) {
+      const { light, dark } = THEME_SETTING;
       isDark
-        ? this.contentEditor?.setTheme('dark', 'dark')
-        : this.contentEditor?.setTheme('classic', 'light');
+        ? this.contentEditor?.setTheme(dark.theme, dark.contentTheme)
+        : this.contentEditor?.setTheme(light.theme, light.contentTheme);
     },
   },
   data() {
     return {
       contentEditor: null,
       delayTime: 500,
-      skeletonRowCol: skeletonRowCol,
+      skeletonRowCol: SKELETON_ROW_COL,
     };
   },
   methods: {
@@ -56,37 +59,51 @@ export default {
     },
     initViditor(cb) {
       const { isDark, value } = this;
-      const theme = isDark ? 'dark' : 'classic';
-      // 为了防止闪屏抖动，延迟500ms挂载vditor
-      setTimeout(() => {
-        this.contentEditor = new Vditor('vditor', {
-          ...vditorBaseConfigs,
-          input: this.contentChange,
-          theme,
-          preview: {
-            theme: {
-              current: theme
-            }
+      const { light, dark } = THEME_SETTING;
+      const initTheme = isDark ? dark : light;
+      this.contentEditor = new Vditor('vditor', {
+        ...VDITOR_BASE_CONFIGS,
+        input: this.contentChange,
+        value,
+        theme: initTheme.theme,
+        toolbar: this.generateToolbar(),
+        preview: {
+          delay: 50,
+          theme: {
+            current: initTheme.contentTheme,
+          }
+        },
+        counter: {
+          enable: true,
+          type: 'text',
+          after: (length) => {
+            this.countWord(length);
+            cb();
           },
-          value,
-          counter: {
-            enable: true,
-            type: 'text',
-            after: (length) => {
-              this.countWord(length);
-              cb();
-            },
-          },
-        });
-      }, this.delayTime);
+        },
+      });
     },
+    generateToolbar() {
+      const indexOfLink = VDITOR_TOOLBAR.indexOf('link');
+      VDITOR_TOOLBAR.splice(indexOfLink, 0, {
+        ...UPLOAD_BASE_CONFIGS,
+        click: () => {
+          this.$emit('insertImage');
+        }
+      });
+      return VDITOR_TOOLBAR;
+    }
   },
 };
 </script>
 
 <style lang="less" scoped>
+#vditor {
+  height: 600px;
+  z-index: 9999 !important;
+}
 .vditor-skeleton {
   padding: 20px;
-  height: 600px;
+  height: 100%;
 }
 </style>
