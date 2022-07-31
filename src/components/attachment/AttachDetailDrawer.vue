@@ -70,8 +70,18 @@ export default {
   computed: {
     attachmentStorageType() {
       switch (this.attachment.type) {
-        case 0:
+        case "local":
           return "本地";
+        case "qcloud_cos":
+          return "腾讯云 COS";
+        case "aliyun_oss":
+          return "阿里云 OSS";
+        case "huawei_obs":
+          return "华为 OBS";
+        case "qiniuyun":
+          return "七牛云";
+        case "youpaiyun":
+          return "又拍云";
         default:
           return "未知";
       }

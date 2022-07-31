@@ -1,7 +1,7 @@
 <template>
   <PageView>
     <template slot="content">
-      <t-card title="仪表盘" :bordered="false"> 未实现 </t-card>
+      <t-card title="个人信息" :bordered="false"> 未实现 </t-card>
     </template>
   </PageView>
 </template>
@@ -9,7 +9,7 @@
 <script>
 import PageView from "@/layouts/PageView";
 export default {
-  name: "Dashboard",
+  name: "UserInfo",
   data() {
     return {};
   },
