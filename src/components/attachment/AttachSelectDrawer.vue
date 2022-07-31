@@ -202,11 +202,10 @@ export default {
   display: flex;
   align-content: flex-start;
   flex-wrap: wrap;
-  height: @image-wrapper-height;
+  height: 100%;
   width: 100%;
   margin: 10px 0px;
-  overflow: scroll;
-
+  overflow: auto;
   .image-item {
     position: relative;
     flex: 1 1 160px;
@@ -215,7 +214,6 @@ export default {
     overflow: hidden;
     background-color: @bg-color-secondarycontainer;
     border: 5px solid var(--td-bg-color-container);
-
     &.image-selected {
       border: 5px solid @brand-color-6;
     }
