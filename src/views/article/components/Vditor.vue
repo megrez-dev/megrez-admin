@@ -14,7 +14,7 @@
 
 <script>
 import Vditor from 'vditor';
-import { VDITOR_BASE_CONFIGS, SKELETON_ROW_COL, THEME_SETTING, VDITOR_TOOLBAR, UPLOAD_BASE_CONFIGS } from '@/views/article/constants';
+import { VDITOR_BASE_CONFIGS, SKELETON_ROW_COL, THEME_SETTING, VDITOR_TOOLBAR, INSERT_IMG_CONFIGS } from '@/views/article/constants';
 import 'vditor/dist/index.css';
 
 export default {
@@ -66,7 +66,7 @@ export default {
         input: this.contentChange,
         value,
         theme: initTheme.theme,
-        toolbar: this.generateToolbar(),
+        toolbar: this.initToolbar(),
         preview: {
           delay: 50,
           theme: {
@@ -83,15 +83,17 @@ export default {
         },
       });
     },
-    generateToolbar() {
-      const indexOfLink = VDITOR_TOOLBAR.indexOf('link');
-      VDITOR_TOOLBAR.splice(indexOfLink, 0, {
-        ...UPLOAD_BASE_CONFIGS,
+    initToolbar() {
+      // 创建新的数组，防止直接修改VDITOR_TOOLBAR
+      const toolbar = [...VDITOR_TOOLBAR];
+      const indexOfLink = toolbar.indexOf('link');
+      toolbar.splice(indexOfLink, 0, {
+        ...INSERT_IMG_CONFIGS,
         click: () => {
           this.$emit('insertImage');
         }
       });
-      return VDITOR_TOOLBAR;
+      return toolbar;
     }
   },
 };
@@ -99,7 +101,7 @@ export default {
 
 <style lang="less" scoped>
 #vditor {
-  height: 600px;
+  height: calc(100vh - 250px);
   z-index: 9999 !important;
 }
 .vditor-skeleton {

@@ -16,7 +16,7 @@ export const THEME_SETTING = {
   }
 }
 
-export const UPLOAD_BASE_CONFIGS = {
+export const INSERT_IMG_CONFIGS = {
   name: 'megrez-image',
   tip: '插入图片',
   tipPosition: 'nw',
@@ -50,7 +50,7 @@ export const VDITOR_TOOLBAR = [
 ];
 
 export const VDITOR_BASE_CONFIGS = {
-  height: 600,
+  height: 'calc(100vh - 250px)',
   icon: 'material',
   mode: 'wysiwyg',
   outline: {
