@@ -12,7 +12,6 @@
         <t-input
           v-model="loginForm.username"
           placeholder="用户名"
-          @enter="handleLogin"
         >
           <user-icon slot="prefix-icon"></user-icon>
         </t-input>
@@ -22,7 +21,6 @@
           type="password"
           v-model="loginForm.password"
           placeholder="密码"
-          @enter="handleLogin"
         >
           <lock-on-icon slot="prefix-icon"></lock-on-icon>
         </t-input>
@@ -58,9 +56,6 @@ export default {
   },
 
   methods: {
-    handleLogin() {
-      this.$refs.loginForm.submit();
-    },
     onSubmit({ validateResult, firstError }) {
       if (validateResult === true) {
         this.$request.post("login", this.loginForm).then((res) => {

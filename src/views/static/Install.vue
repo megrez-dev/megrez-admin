@@ -16,7 +16,6 @@
         <t-input
           v-model="installForm.username"
           placeholder="用户名"
-          @enter="handleInstall"
         >
           <user-icon slot="prefix-icon"></user-icon>
         </t-input>
@@ -25,7 +24,6 @@
         <t-input
           v-model="installForm.nickname"
           placeholder="昵称"
-          @enter="handleInstall"
         >
           <user-icon slot="prefix-icon"></user-icon>
         </t-input>
@@ -34,7 +32,6 @@
         <t-input
           v-model="installForm.email"
           placeholder="邮箱"
-          @enter="handleInstall"
         >
           <mail-icon slot="prefix-icon"></mail-icon>
         </t-input>
@@ -44,7 +41,6 @@
           type="password"
           v-model="installForm.password"
           placeholder="密码"
-          @enter="handleInstall"
         >
           <lock-on-icon slot="prefix-icon"></lock-on-icon>
         </t-input>
@@ -54,7 +50,6 @@
           type="password"
           v-model="installForm.confirmPassword"
           placeholder="确认密码"
-          @enter="handleInstall"
         >
           <lock-on-icon slot="prefix-icon"></lock-on-icon>
         </t-input>
@@ -68,7 +63,6 @@
         <t-input
           v-model="installForm.blogURL"
           placeholder="博客 URL"
-          @enter="handleInstall"
         >
           <link-icon slot="prefix-icon"></link-icon>
         </t-input>
@@ -77,7 +71,6 @@
         <t-input
           v-model="installForm.blogTitle"
           placeholder="博客标题"
-          @enter="handleInstall"
         >
           <books-icon slot="prefix-icon"></books-icon>
         </t-input>

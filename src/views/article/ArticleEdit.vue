@@ -471,9 +471,6 @@ export default {
             });
             this.cancelCreateCategory();
           }
-        })
-        .catch(() => {
-          this.$message.warning('创建分类失败');
         });
     },
     cancelCreateCategory() {
@@ -482,29 +479,22 @@ export default {
       this.showAddCategoryForm = false;
     },
     handleCreateTag(value) {
-      value = value.replace(/\s*/g, '');
-      if (value === '') {
-        this.$message.warning('标签不能为空');
-        return;
-      }
-      var newTag = {
-        name: value,
-        slug: value,
-      };
+      const tagName = value.replace(/\s*/g, '');
+      if (tagName === '') return this.$message.warning('标签不能为空');
       this.$request
-        .post('tag', newTag)
+        .post('tag', { name: tagName, slug: tagName })
         .then((res) => {
           this.$message.success('创建标签成功');
           this.tagOptions.push({
             value: res.data.id,
             label: res.data.name,
           });
+          // 由于添加至article.tags中的应该是id，而不是value，value仅用于创建tag
           this.article.tags.splice(this.article.tags.indexOf(value), 1);
           this.article.tags.push(res.data.id);
         })
         .catch(() => {
           this.article.tags.splice(this.article.tags.indexOf(value), 1);
-          this.$message.error('创建标签失败');
         });
     },
     createSEOKeyword(value) {
