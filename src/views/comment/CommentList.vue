@@ -31,9 +31,9 @@
             <template #author="{ row }">
               <a
                 class="t-button-link"
-                :href="row.site"
+                :href="row.url"
                 target="_blank"
-                v-if="row.site != ''"
+                v-if="row.url != ''"
                 >{{ row.author }}</a
               >
             </template>
