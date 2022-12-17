@@ -13,6 +13,7 @@ import VueViewer from 'v-viewer';
 import { timeAgo } from '@/utils/datetime';
 
 import 'viewerjs/dist/viewer.css';
+import 'tdesign-vue/dist/reset.css';
 
 Vue.config.productionTip = false;
 

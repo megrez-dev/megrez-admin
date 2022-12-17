@@ -18,9 +18,6 @@
       </t-col>
       <t-col flex="1 0 auto">
         <t-row justify="end">
-          <t-button theme="warning" variant="dashed" @click="openAttachesSelectDrawer">
-            附件
-          </t-button>
           <t-button
             :loading="saving"
             :disabled="publishing || !loaded"
@@ -47,7 +44,13 @@
         <t-input size="large" placeholder="请输入标题" v-model="article.title" />
       </div>
       <div class="vditor-container">
-        <Vditor ref="vditor" v-model="article.originalContent" @countWord="countWord"></Vditor>
+        <Vditor 
+          ref="vditor"
+          v-model="article.originalContent"
+          :loading="!loaded"
+          @countWord="countWord"
+          @insertImage="openAttachesSelectDrawer"
+        />
       </div>
       <t-tabs defaultValue="basic">
         <t-tab-panel value="basic">
@@ -213,8 +216,7 @@ import AttachSelectDrawer from '@/components/attachment/AttachSelectDrawer.vue';
 import PageView from '@/layouts/PageView';
 import MImage from '@/components/image/Image.vue';
 import { Icon } from 'tdesign-icons-vue';
-import { editMode, defaultCoverUrl } from '@/views/article/constants';
-import { articleStatusMap } from '@/views/article/constants';
+import { EDIT_MODE, DEFAULT_COVER_URL, ARTICLE_STATUS_MAP } from '@/views/article/constants';
 
 export default {
   name: 'ArticleEdit',
@@ -269,10 +271,10 @@ export default {
       return this.$route.query.articleID;
     },
     editMode() {
-      return this.articleID === undefined ? editMode.CREATE : editMode.EDIT;
+      return this.articleID === undefined ? EDIT_MODE.create : EDIT_MODE.edit;
     },
     coverUrl() {
-      return this.article.cover || defaultCoverUrl;
+      return this.article.cover || DEFAULT_COVER_URL;
     },
   },
   methods: {
@@ -356,7 +358,7 @@ export default {
       this.saving = true;
       this.article.formatContent = this.getFormatContent();
       this.article.status = 1;
-      if (this.editMode === editMode.CREATE) {
+      if (this.editMode === EDIT_MODE.create) {
         this.$request
           .post('article', this.article)
           .then((res) => {
@@ -398,7 +400,7 @@ export default {
       this.article.formatContent = this.getFormatContent();
       this.article.status = 0;
       // create
-      if (this.editMode === editMode.CREATE) {
+      if (this.editMode === EDIT_MODE.create) {
         this.$request
           .post('article', this.article)
           .then((res) => {
@@ -469,9 +471,6 @@ export default {
             });
             this.cancelCreateCategory();
           }
-        })
-        .catch(() => {
-          this.$message.warning('创建分类失败');
         });
     },
     cancelCreateCategory() {
@@ -480,29 +479,22 @@ export default {
       this.showAddCategoryForm = false;
     },
     handleCreateTag(value) {
-      value = value.replace(/\s*/g, '');
-      if (value === '') {
-        this.$message.warning('标签不能为空');
-        return;
-      }
-      var newTag = {
-        name: value,
-        slug: value,
-      };
+      const tagName = value.replace(/\s*/g, '');
+      if (tagName === '') return this.$message.warning('标签不能为空');
       this.$request
-        .post('tag', newTag)
+        .post('tag', { name: tagName, slug: tagName })
         .then((res) => {
           this.$message.success('创建标签成功');
           this.tagOptions.push({
             value: res.data.id,
             label: res.data.name,
           });
+          // 由于添加至article.tags中的应该是id，而不是value，value仅用于创建tag
           this.article.tags.splice(this.article.tags.indexOf(value), 1);
           this.article.tags.push(res.data.id);
         })
         .catch(() => {
           this.article.tags.splice(this.article.tags.indexOf(value), 1);
-          this.$message.error('创建标签失败');
         });
     },
     createSEOKeyword(value) {
@@ -512,15 +504,8 @@ export default {
       });
     },
     handleAttachSelect(attaches) {
-      this.$refs.vditor.append('\n');
-      this.$refs.vditor.append(
-        attaches
-          .map((attach) => {
-            return `![${attach.fileName}](${attach.url})`;
-          })
-          .join('\n')
-      );
-      this.$refs.vditor.append('\n');
+      const willInsertValue = attaches.map(attach => `![${attach.fileName}](${attach.url})`).join('\n');
+      this.$refs.vditor.contentEditor.insertValue(willInsertValue);
     },
     handleCoverSelect(attach) {
       this.article.cover = attach.url;
@@ -546,10 +531,10 @@ export default {
 
   filters: {
     statusTheme(status) {
-      return articleStatusMap[status].theme || 'danger';
+      return ARTICLE_STATUS_MAP[status].theme || 'danger';
     },
     statusText(status) {
-      return articleStatusMap[status].text || '未知';
+      return ARTICLE_STATUS_MAP[status].text || '未知';
     },
   },
 
@@ -590,6 +575,9 @@ export default {
 .article-edit-bar {
   margin-bottom: 10px;
   flex-wrap: nowrap;
+  h1 {
+    margin-bottom: 8px;
+  }
   .last-edit-time {
     margin-left: 10px;
     color: var(--td-text-color-placeholder);

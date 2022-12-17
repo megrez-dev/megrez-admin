@@ -6,7 +6,7 @@
           <t-table
             :data="commentList"
             :columns="columns"
-            rowKey="property"
+            rowKey="id"
             verticalAlign="middle"
             :loading="isCommentListLoading"
             :pagination="pagination"
@@ -17,7 +17,7 @@
                 class="t-button-link"
                 :href="'/article/' + row.article.id"
                 target="_blank"
-                v-if="row.type === 1"
+                v-if="row.type === COMMENT_TYPE.ARTICLE"
                 >{{ row.article.title }}</a
               >
               <a
@@ -31,9 +31,9 @@
             <template #author="{ row }">
               <a
                 class="t-button-link"
-                :href="row.site"
+                :href="row.url"
                 target="_blank"
-                v-if="row.site != ''"
+                v-if="row.url != ''"
                 >{{ row.author }}</a
               >
             </template>
@@ -80,6 +80,11 @@ export default {
   name: "CommentList",
   data() {
     return {
+      COMMENT_TYPE: {
+        ARTICLE: 0,
+        PAGE: 1,
+        // JOURNAL: 2,
+      },
       commentList: [],
       isCommentListLoading: false,
       columns: [

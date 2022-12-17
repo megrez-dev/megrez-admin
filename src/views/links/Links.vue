@@ -59,7 +59,7 @@
             <t-table
               :data="links"
               :columns="columns"
-              rowKey="property"
+              rowKey="id"
               verticalAlign="middle"
               :loading="isLoading"
               :pagination="pagination"

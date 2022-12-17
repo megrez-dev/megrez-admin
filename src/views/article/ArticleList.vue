@@ -80,7 +80,7 @@
 <script>
 import { AddIcon, EditIcon, DeleteIcon, SettingIcon } from 'tdesign-icons-vue';
 import PageView from '@/layouts/PageView';
-import { articleStatusMap } from '@/views/article/constants';
+import { ARTICLE_STATUS_MAP } from '@/views/article/constants';
 
 export default {
   name: 'ArticleList',
@@ -109,10 +109,10 @@ export default {
   filters: {
     // 用于获取
     statusColor(status) {
-      return articleStatusMap[status].color || 'red';
+      return ARTICLE_STATUS_MAP[status].color || 'red';
     },
     statusText(status) {
-      return articleStatusMap[status].text || '未知';
+      return ARTICLE_STATUS_MAP[status].text || '未知';
     },
   },
   mounted() {
