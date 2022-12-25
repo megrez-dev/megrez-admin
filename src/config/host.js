@@ -1,7 +1,7 @@
 export default {
     dev: {
       // 开发环境接口请求
-      API: 'http://localhost:8080/api/admin/',
+      API: '/api/admin/',
       // 开发环境 cdn 路径
       CDN: '',
     },
