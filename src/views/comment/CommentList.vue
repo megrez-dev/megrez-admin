@@ -81,9 +81,9 @@ export default {
   data() {
     return {
       COMMENT_TYPE: {
-        ARTICLE: 0,
-        PAGE: 1,
-        // JOURNAL: 2,
+        ARTICLE: "article",
+        PAGE: "page",
+        // JOURNAL: "journal",
       },
       commentList: [],
       isCommentListLoading: false,
