@@ -8,7 +8,11 @@
         </div>
         <span class="page-header-bar-operator">
           <span class="page-header-bar-operator-item">
-            <t-button theme="primary" variant="base" @click="onClickSave"
+            <t-button
+              theme="primary"
+              variant="base"
+              @click="onClickSave"
+              :loading="saveBtnLoading"
               >保存设置</t-button
             >
           </span>
@@ -80,6 +84,7 @@
                   <t-input-group separate v-if="item.type === 'image'">
                     <t-input
                       v-model="item.value"
+                      clearable
                       :placeholder="item.placeholder"
                       :style="{ width: '500px' }"
                     ></t-input>
@@ -98,6 +103,8 @@
         </t-tabs>
         <AttachSelectDrawer
           ref="attachSelectDrawer"
+          mode="single"
+          :visible.sync="drawerVisible"
           @select="selectAttach"
         ></AttachSelectDrawer>
       </div>
@@ -112,9 +119,11 @@ export default {
   name: "ThemeSetting",
   data() {
     return {
+      saveBtnLoading: false,
       themeConfig: {
         tabs: [],
       },
+      drawerVisible: false,
       currentTheme: "",
       selectedAttachTabIndex: 0,
       selectedAttachItemIndex: 0,
@@ -122,19 +131,20 @@ export default {
   },
   methods: {
     openAttachSelectDrawer(tab, item) {
-      this.$refs.attachSelectDrawer.open();
+      this.drawerVisible = true;
       this.selectedAttachTabIndex = this.themeConfig.tabs.indexOf(tab);
       this.selectedAttachItemIndex =
         this.themeConfig.tabs[this.selectedAttachTabIndex].items.indexOf(item);
     },
     onClickSave() {
+      this.saveBtnLoading = true;
       this.$request
         .put("/theme/current/config", this.themeConfig)
         .then(() => {
           this.$message.success("保存成功");
         })
-        .catch(() => {
-          this.$message.error("保存失败");
+        .finally(() => {
+          this.saveBtnLoading = false;
         });
     },
     fetchConfig() {

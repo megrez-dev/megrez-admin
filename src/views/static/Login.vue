@@ -1,6 +1,6 @@
 <template>
   <div class="login-card-container">
-    <h1 style="text-align: center">Megrez</h1>
+    <h1 style="text-align: center;margin-bottom:16px;">Megrez</h1>
     <t-form
       :data="loginForm"
       ref="loginForm"
@@ -9,10 +9,7 @@
       @submit="onSubmit"
     >
       <t-form-item name="username">
-        <t-input
-          v-model="loginForm.username"
-          placeholder="用户名"
-        >
+        <t-input v-model="loginForm.username" placeholder="用户名">
           <user-icon slot="prefix-icon"></user-icon>
         </t-input>
       </t-form-item>
@@ -26,7 +23,11 @@
         </t-input>
       </t-form-item>
       <t-form-item>
-        <t-button theme="primary" type="submit" style="width: 100%"
+        <t-button
+          theme="primary"
+          type="submit"
+          style="width: 100%"
+          :loading="loginBtnLoading"
           >登录</t-button
         >
       </t-form-item>
@@ -44,6 +45,7 @@ export default {
 
   data() {
     return {
+      loginBtnLoading: false,
       loginForm: {
         username: "",
         password: "",
@@ -58,11 +60,17 @@ export default {
   methods: {
     onSubmit({ validateResult, firstError }) {
       if (validateResult === true) {
-        this.$request.post("login", this.loginForm).then((res) => {
-          this.$message.success("登录成功");
-          this.$store.commit("SET_TOKEN", res.data);
-          this.$router.push({ name: "Dashboard" });
-        });
+        this.loginBtnLoading = true;
+        this.$request
+          .post("login", this.loginForm)
+          .then((res) => {
+            this.$message.success("登录成功");
+            this.$store.commit("SET_TOKEN", res.data);
+            this.$router.push({ name: "Dashboard" });
+          })
+          .finally(() => {
+            this.loginBtnLoading = false;
+          });
       } else {
         this.$message.error(firstError);
       }

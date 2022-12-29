@@ -37,9 +37,7 @@ export default {
     close() {
       this.visible = false;
     },
-    handleUploadFail() {
-      this.$message.error("上传失败");
-    },
+    handleUploadFail() {},
     handleUploadSuccess() {
       this.$message.success("上传成功");
       this.$emit("uploadSuccess");

@@ -217,7 +217,7 @@ export default {
   display: flex;
   .card-container {
     margin: 0 10px;
-    width: 24.9999%;
+    width: 400px;
   }
 }
 </style>

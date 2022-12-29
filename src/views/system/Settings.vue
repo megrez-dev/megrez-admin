@@ -7,7 +7,11 @@
         </div>
         <span class="page-header-bar-operator">
           <span class="page-header-bar-operator-item">
-            <t-button theme="primary" variant="base" @click="onClickSave"
+            <t-button
+              theme="primary"
+              variant="base"
+              @click="onClickSave"
+              :loading="saveBtnLoading"
               >保存设置</t-button
             >
           </span>
@@ -43,13 +47,14 @@
                   <t-input-group separate>
                     <t-input
                       v-model="settings.basic.blogFavicon"
+                      clearable
                       :style="{ width: '500px' }"
                     ></t-input>
                     <t-button
                       theme="primary"
                       shape="square"
                       variant="outline"
-                      @click="openAttachSelectDrawer()"
+                      @click="openFaviconSelectDrawer()"
                       ><image-icon slot="icon"
                     /></t-button>
                   </t-input-group>
@@ -113,17 +118,26 @@
             </div>
           </t-tab-panel>
         </t-tabs>
+        <AttachSelectDrawer
+          ref="faviconSelectDrawer"
+          mode="single"
+          :visible.sync="faviconSelectDrawerVisiable"
+          @select="selectFavicon"
+        ></AttachSelectDrawer>
       </div>
     </template>
   </PageView>
 </template>
 <script>
 import { Icon, ImageIcon } from "tdesign-icons-vue";
+import AttachSelectDrawer from "@/components/attachment/AttachSelectDrawer.vue";
 import PageView from "@/layouts/PageView";
 export default {
   name: "Settings",
   data() {
     return {
+      saveBtnLoading: false,
+      faviconSelectDrawerVisiable: false,
       settings: {
         basic: {
           blogTitle: "",
@@ -180,17 +194,26 @@ export default {
         });
     },
     onClickSave() {
-      this.$request.put("settings", this.settings).then(() => {
-        this.$message.success("保存成功");
-      });
+      this.saveBtnLoading = true;
+      this.$request
+        .put("settings", this.settings)
+        .then(() => {
+          this.$message.success("保存成功");
+        })
+        .finally(() => {
+          this.saveBtnLoading = false;
+        });
     },
     fetchSettings() {
       this.$request.get("settings").then((res) => {
         this.settings = res.data;
       });
     },
-    openAttachSelectDrawer() {
-      this.$message.info("未实现");
+    openFaviconSelectDrawer() {
+      this.faviconSelectDrawerVisiable = true;
+    },
+    selectFavicon(attach) {
+      this.settings.basic.blogFavicon = attach.url;
     },
   },
   beforeMount() {
@@ -199,6 +222,7 @@ export default {
   components: {
     Icon,
     ImageIcon,
+    AttachSelectDrawer,
     PageView,
   },
 };

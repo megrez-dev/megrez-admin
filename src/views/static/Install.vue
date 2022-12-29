@@ -13,26 +13,17 @@
         </div></t-divider
       >
       <t-form-item name="username">
-        <t-input
-          v-model="installForm.username"
-          placeholder="用户名"
-        >
+        <t-input v-model="installForm.username" placeholder="用户名">
           <user-icon slot="prefix-icon"></user-icon>
         </t-input>
       </t-form-item>
       <t-form-item name="nickname">
-        <t-input
-          v-model="installForm.nickname"
-          placeholder="昵称"
-        >
+        <t-input v-model="installForm.nickname" placeholder="昵称">
           <user-icon slot="prefix-icon"></user-icon>
         </t-input>
       </t-form-item>
       <t-form-item name="email">
-        <t-input
-          v-model="installForm.email"
-          placeholder="邮箱"
-        >
+        <t-input v-model="installForm.email" placeholder="邮箱">
           <mail-icon slot="prefix-icon"></mail-icon>
         </t-input>
       </t-form-item>
@@ -60,23 +51,22 @@
         </div></t-divider
       >
       <t-form-item name="blogURL">
-        <t-input
-          v-model="installForm.blogURL"
-          placeholder="博客 URL"
-        >
+        <t-input v-model="installForm.blogURL" placeholder="博客 URL">
           <link-icon slot="prefix-icon"></link-icon>
         </t-input>
       </t-form-item>
       <t-form-item name="blogTitle">
-        <t-input
-          v-model="installForm.blogTitle"
-          placeholder="博客标题"
-        >
+        <t-input v-model="installForm.blogTitle" placeholder="博客标题">
           <books-icon slot="prefix-icon"></books-icon>
         </t-input>
       </t-form-item>
       <t-form-item>
-        <t-button theme="primary" type="submit" size="large" style="width: 100%"
+        <t-button
+          theme="primary"
+          type="submit"
+          size="large"
+          style="width: 100%"
+          :loading="installBtnLoading"
           >安装</t-button
         >
       </t-form-item>
@@ -102,6 +92,7 @@ export default {
 
   data() {
     return {
+      installBtnLoading: false,
       installForm: {
         username: "",
         nickname: "",
@@ -146,15 +137,15 @@ export default {
     },
     onSubmit({ validateResult, firstError }) {
       if (validateResult === true) {
+        this.installBtnLoading = true
         this.$request
           .post("install", this.installForm)
           .then(() => {
             this.$message.success("安装成功");
             this.$router.push({ name: "Login" });
           })
-          .catch(() => {
-            this.$message.error("安装失败");
-            // TODO: 换成修改按钮状态
+          .finally(() => {
+            this.installBtnLoading = false
           });
       } else {
         this.$message.warning(firstError);
