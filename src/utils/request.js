@@ -1,6 +1,5 @@
 import Vue from "vue";
 import axios from "axios";
-import host from "@/config/host";
 import router from "@/router";
 import { ACCESS_TOKEN } from "@/store/mutation-types";
 // import store from '@/store'
@@ -9,7 +8,7 @@ import { MessagePlugin } from "tdesign-vue";
 // const env = import.meta.env.MODE || 'development';
 
 // const API_HOST = env === 'mock' ? '/' : host[env].API; // 如果是mock模式 就不配置host 会走本地Mock拦截
-const API_HOST = host["dev"].API;
+const API_HOST = '/api/admin/';
 
 const CODE = {
   SUCCESS: 0,
