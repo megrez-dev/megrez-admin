@@ -148,6 +148,9 @@ export default {
             .then((res) => {
               this.themes = res.data;
               for (let theme of this.themes) {
+                if (theme.cover === '') {
+                  theme.cover = require('@/assets/default.png')
+                }
                 if (theme.id === this.currentThemeID) {
                   theme.isCurrent = true;
                   this.currentTheme = theme;
